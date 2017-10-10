@@ -2,12 +2,7 @@ package ru.skypathway.jsontest.data;
 
 
 import android.content.Context;
-import android.net.Uri;
 import android.support.v4.content.AsyncTaskLoader;
-import android.util.Log;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,37 +17,18 @@ import ru.skypathway.jsontest.utils.Constants;
  * Created by samsmariya on 10.10.17.
  */
 
-public class DataLoader extends AsyncTaskLoader<JSONObject> {
-    private static final String TAG = DataLoader.class.getSimpleName();
+public abstract class BaseLoader<D> extends AsyncTaskLoader<D> {
+    private static final String TAG = BaseLoader.class.getSimpleName();
 
-    private Constants.CategoryEnum mCategory;
-    private int mObjectId;
+    protected Constants.CategoryEnum mCategory;
+    protected int mObjectId;
 
-    public DataLoader(Context context,
+    public BaseLoader(Context context,
                       Constants.CategoryEnum category,
                       int objectId) {
         super(context);
         mCategory = category;
         mObjectId = objectId;
-    }
-
-    @Override
-    public JSONObject loadInBackground() {
-        try {
-            String url = Uri.parse("https://jsonplaceholder.typicode.com/")
-                    .buildUpon()
-                    .appendPath(mCategory.value)
-                    .appendPath(Integer.toString(mObjectId))
-                    .build().toString();
-            String jsonString = getUrlString(url);
-            JSONObject jsonBody = new JSONObject(jsonString);
-            return jsonBody;
-        } catch (IOException ioe) {
-            Log.e(TAG, "Failed ", ioe);
-        }catch (JSONException je){
-            Log.e(TAG, "Failed to parse JSON", je);
-        }
-        return null;
     }
 
     /**
