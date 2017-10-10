@@ -1,29 +1,45 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="ru.skypathway.jsontest.MainFragment">
+    android:scrollbars="vertical"
+    android:fillViewport="true">
 
-    <fragment
-        android:id="@+id/fragment_posts"
-        android:name="ru.skypathway.jsontest.PostsFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutManager="android.support.v7.widget.StaggeredGridLayoutManager"
         android:orientation="vertical"
-        app:spanCount="@integer/span_count_main_recycler_view"
-        android:padding="@dimen/padding_normal"
-        android:clipToPadding="false"
-        android:scrollbars="vertical"
-        android:visibility="gone"
-        />
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        tools:context="ru.skypathway.jsontest.MainFragment">
 
-</LinearLayout>
+        <fragment
+            android:id="@+id/fragment_posts"
+            android:name="ru.skypathway.jsontest.PostsFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <fragment
+            android:id="@+id/fragment_users"
+            android:name="ru.skypathway.jsontest.UsersFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="android.support.v7.widget.StaggeredGridLayoutManager"
+            android:orientation="vertical"
+            app:spanCount="@integer/span_count_main_recycler_view"
+            android:padding="@dimen/padding_normal"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            android:visibility="gone"
+            />
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>
