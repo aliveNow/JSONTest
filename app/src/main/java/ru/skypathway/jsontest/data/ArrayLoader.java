@@ -1,13 +1,11 @@
 package ru.skypathway.jsontest.data;
 
 import android.content.Context;
-import android.net.Uri;
-import android.util.Log;
+import android.support.annotation.NonNull;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,29 +22,20 @@ public class ArrayLoader<T extends BaseObject> extends BaseLoader<List<T>> {
 
     public ArrayLoader(Context context,
                        Constants.CategoryEnum category,
-                       int objectId) {
-        super(context, category, objectId);
+                       int[] objectIds) {
+        super(context, category, objectIds);
     }
 
     @Override
-    public List<T> loadInBackground() {
-        try {
-            String url = Uri.parse("https://jsonplaceholder.typicode.com/")
-                    .buildUpon()
-                    .appendPath(mCategory.value)
-                    .appendPath(Integer.toString(mObjectId))
-                    .build().toString();
-            String jsonString = getUrlString(url);
+    protected List<T> convertToResult(@NonNull List<String> strings) throws JSONException {
+        List<T> result = new ArrayList<>();
+        for (String jsonString : strings) {
             JSONObject jsonBody = new JSONObject(jsonString);
-            List<T> result = new ArrayList<>();
-            BaseObject baseObject = JSONConverter.getPost(jsonBody);
-            result.add((T)baseObject);
-            return result;
-        } catch (IOException ioe) {
-            Log.e(TAG, "Failed ", ioe);
-        }catch (JSONException je){
-            Log.e(TAG, "Failed to parse JSON", je);
+            T baseObject = (T) JSONConverter.getPost(jsonBody);
+            if (baseObject != null) {
+                result.add(baseObject);
+            }
         }
-        return null;
+        return result;
     }
 }
