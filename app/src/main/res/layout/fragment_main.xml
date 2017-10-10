@@ -1,16 +1,20 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="ru.skypathway.jsontest.MainActivity$PlaceholderFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="ru.skypathway.jsontest.MainFragment">
 
-    <TextView
-        android:id="@+id/section_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutManager="android.support.v7.widget.StaggeredGridLayoutManager"
+        android:orientation="vertical"
+        app:spanCount="@integer/span_count_main_recycler_view"
+        android:padding="@dimen/padding_normal"
+        android:clipToPadding="false"
+        android:scrollbars="vertical"
+        />
 
-</RelativeLayout>
+</FrameLayout>
