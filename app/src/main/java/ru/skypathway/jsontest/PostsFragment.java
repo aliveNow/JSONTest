@@ -5,61 +5,46 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.json.JSONObject;
 
-import ru.skypathway.jsontest.data.adapters.MainCardsAdapter.CardItem;
+import ru.skypathway.jsontest.data.DataLoader;
 import ru.skypathway.jsontest.utils.Constants;
 
 
 /**
- * Created by samsmariya on 10.10.17.
  *
- * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MainFragment.OnFragmentInteractionListener} interface
+ * {@link PostsFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MainFragment} factory method to
- * create an instance of this fragment.
  */
-public class MainFragment extends Fragment {
-
+public class PostsFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<JSONObject> {
     private OnFragmentInteractionListener mListener;
-    private RecyclerView mRecyclerView;
+    private TextView mTextPost;
 
-    public MainFragment() {}
-
-    public static MainFragment newInstance() {
-        MainFragment fragment = new MainFragment();
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public PostsFragment() {
+        // Required empty public constructor
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        View view = inflater.inflate(R.layout.fragment_posts, container, false);
+        mTextPost = (TextView) view.findViewById(R.id.text_post);
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        /*
-        MainCardsAdapter cardsAdapter = new MainCardsAdapter(getCardItems());
-        mRecyclerView.setAdapter(cardsAdapter);
-        */
+        getLoaderManager().initLoader(Constants.Loaders.POSTS, null, this);
     }
 
     @Override
@@ -79,15 +64,22 @@ public class MainFragment extends Fragment {
         mListener = null;
     }
 
-    public List<CardItem> getCardItems() {
-        // TODO: 10.10.17 расположить в xml?
-        List<CardItem> cardItems = new ArrayList<>();
-        cardItems.add(new CardItem(Constants.POSTS, R.string.title_item_posts));
-        cardItems.add(new CardItem(Constants.COMMENTS, R.string.title_item_comments));
-        cardItems.add(new CardItem(Constants.USERS, R.string.title_item_users));
-        cardItems.add(new CardItem(Constants.PHOTOS, R.string.title_item_photos));
-        cardItems.add(new CardItem(Constants.TODOS, R.string.title_item_todos));
-        return cardItems;
+    @Override
+    public Loader<JSONObject> onCreateLoader(int id, Bundle args) {
+        if (id == Constants.Loaders.POSTS) {
+            return new DataLoader(this.getActivity(), Constants.CategoryEnum.POSTS, 3);
+        }
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<JSONObject> loader, JSONObject data) {
+        mTextPost.setText(data.toString());
+    }
+
+    @Override
+    public void onLoaderReset(Loader<JSONObject> loader) {
+
     }
 
     /**
@@ -100,6 +92,4 @@ public class MainFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-
-
 }

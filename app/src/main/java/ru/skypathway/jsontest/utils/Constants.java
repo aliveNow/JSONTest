@@ -21,6 +21,10 @@ public class Constants {
 
     }
 
+    public static class Loaders {
+        public static final int POSTS = 1;
+    }
+
     public enum CategoryEnum {
         POSTS(Constants.POSTS),
         COMMENTS(Constants.COMMENTS),
