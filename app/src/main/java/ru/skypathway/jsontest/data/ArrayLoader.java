@@ -31,7 +31,7 @@ public class ArrayLoader<T extends BaseObject> extends BaseLoader<List<T>> {
         List<T> result = new ArrayList<>();
         for (String jsonString : strings) {
             JSONObject jsonBody = new JSONObject(jsonString);
-            T baseObject = (T) JSONConverter.getPost(jsonBody);
+            T baseObject = JSONConverter.getBaseObject(jsonBody, mCategory);
             if (baseObject != null) {
                 result.add(baseObject);
             }

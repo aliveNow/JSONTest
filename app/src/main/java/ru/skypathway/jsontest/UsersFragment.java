@@ -3,21 +3,27 @@ package ru.skypathway.jsontest;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Arrays;
 import java.util.List;
+
+import ru.skypathway.jsontest.data.ArrayLoader;
+import ru.skypathway.jsontest.data.dao.User;
+import ru.skypathway.jsontest.utils.Constants;
 
 
 /**
  * Created by samsmariya on 10.10.17.
  */
-public class UsersFragment extends Fragment {
+public class UsersFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<User>> {
     protected RecyclerView mRecyclerView;
+    protected UsersAdapter mUsersAdapter;
 
     public UsersFragment() {
         // Required empty public constructor
@@ -35,16 +41,38 @@ public class UsersFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        String[] users = { "Иван", "Марья", "Петр", "Антон", "Даша", "Иван", "Марья", "Петр", "Антон", "Даша" };
-        UsersAdapter adapter = new UsersAdapter(Arrays.asList(users));
-        mRecyclerView.setAdapter(adapter);
+        mUsersAdapter = new UsersAdapter(null);
+        mRecyclerView.setAdapter(mUsersAdapter);
+        getLoaderManager().initLoader(Constants.Loaders.USERS, null, this);
+    }
+
+    @Override
+    public Loader<List<User>> onCreateLoader(int id, Bundle args) {
+        return new ArrayLoader<>(getActivity(),
+                Constants.CategoryEnum.USERS,
+                getResources().getIntArray(R.array.user_ids));
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<User>> loader, List<User> data) {
+        mUsersAdapter.setUsers(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<User>> loader) {
+        mUsersAdapter.setUsers(null);
     }
 
     private static class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
-        protected List<String> mUsers;
+        protected List<User> mUsers;
 
-        public UsersAdapter(List<String> users) {
+        public UsersAdapter(List<User> users) {
             mUsers = users;
+        }
+
+        public void setUsers(List<User> users) {
+            this.mUsers = users;
+            notifyDataSetChanged();
         }
 
         @Override
@@ -56,9 +84,9 @@ public class UsersFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            String obj = mUsers.get(position);
-            holder.mTextName.setText(obj);
-            holder.mTextUsername.setText(obj);
+            User obj = mUsers.get(position);
+            holder.mTextName.setText(obj.getName());
+            holder.mTextUsername.setText(obj.getUsername());
         }
 
         @Override

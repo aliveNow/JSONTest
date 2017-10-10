@@ -23,6 +23,7 @@ public class Constants {
 
     public static class Loaders {
         public static final int POSTS = 1;
+        public static final int USERS = 2;
     }
 
     public enum CategoryEnum {

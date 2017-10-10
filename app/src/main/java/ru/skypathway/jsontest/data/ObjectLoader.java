@@ -29,7 +29,7 @@ public class ObjectLoader<D extends BaseObject> extends BaseLoader<D> {
     protected D convertToResult(@NonNull List<String> strings) throws JSONException {
         String jsonString = strings.get(0);
         JSONObject jsonBody = new JSONObject(jsonString);
-        D result = (D) JSONConverter.getPost(jsonBody);
+        D result = JSONConverter.getBaseObject(jsonBody, mCategory);
         return result;
     }
 }

@@ -11,7 +11,7 @@ public class Post extends BaseObject {
     Post() {}
 
     public Post(int id, String title, String body) {
-        this.id = id;
+        super(id);
         this.title = title;
         this.body = body;
     }

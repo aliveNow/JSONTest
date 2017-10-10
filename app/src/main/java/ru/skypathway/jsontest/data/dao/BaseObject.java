@@ -9,6 +9,10 @@ public class BaseObject {
 
     BaseObject() {}
 
+    BaseObject(int id) {
+        this.id = id;
+    }
+
     public int getId() {
         return id;
     }

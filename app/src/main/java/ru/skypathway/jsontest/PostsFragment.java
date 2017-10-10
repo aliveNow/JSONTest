@@ -69,7 +69,7 @@ public class PostsFragment extends Fragment
     @Override
     public Loader<Post> onCreateLoader(int id, Bundle args) {
         if (id == Constants.Loaders.POSTS) {
-            return new ObjectLoader<Post>(this.getActivity(), Constants.CategoryEnum.POSTS, 3);
+            return new ObjectLoader<>(this.getActivity(), Constants.CategoryEnum.POSTS, 3);
         }
         return null;
     }
