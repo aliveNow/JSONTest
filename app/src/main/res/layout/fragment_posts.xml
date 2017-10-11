@@ -27,6 +27,7 @@
             android:paddingBottom="@dimen/padding_normal">
 
             <android.support.design.widget.TextInputLayout
+                android:id="@+id/layout_edit_id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="@dimen/padding_normal">
@@ -35,7 +36,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:textAppearanceMedium"
-                    android:hint="@string/hint_enter_post_id"
                     android:maxLines="1"
                     android:imeOptions="actionDone"
                     android:inputType="number">

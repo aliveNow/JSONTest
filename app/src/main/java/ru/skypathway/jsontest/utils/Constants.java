@@ -29,16 +29,20 @@ public class Constants {
     }
 
     public enum CategoryEnum {
-        POSTS(Constants.POSTS),
-        COMMENTS(Constants.COMMENTS),
-        USERS(Constants.USERS),
-        PHOTOS(Constants.PHOTOS),
-        TODOS(Constants.TODOS);
+        POSTS(Constants.POSTS, 1, 100),
+        COMMENTS(Constants.COMMENTS, 1, 500),
+        USERS(Constants.USERS, 1, 10),
+        PHOTOS(Constants.PHOTOS, 1, 5000),
+        TODOS(Constants.TODOS, 1, 200);
 
         public final String value;
+        public final int minId;
+        public final int maxId;
 
-        CategoryEnum(String value) {
+        CategoryEnum(String value, int minId, int maxId) {
             this.value = value;
+            this.minId = minId;
+            this.maxId = maxId;
         }
     }
 

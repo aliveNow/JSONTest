@@ -4,9 +4,11 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.text.InputFilter;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,7 @@ import android.widget.TextView;
 import ru.skypathway.jsontest.data.ObjectLoader;
 import ru.skypathway.jsontest.data.dao.Post;
 import ru.skypathway.jsontest.utils.Constants;
+import ru.skypathway.jsontest.utils.InputFilterMinMax;
 import ru.skypathway.jsontest.utils.Utils;
 
 
@@ -36,18 +39,18 @@ public class PostsFragment extends Fragment
     protected Post mObject;
     protected int mObjectId;
     protected int mLoaderId = Constants.Loaders.POSTS;
+    protected Constants.CategoryEnum mCategory = Constants.CategoryEnum.POSTS;
 
     protected View mLayoutResults;
     private TextView mTextTitle;
     private TextView mTextPost;
     protected View mLayoutEnterId;
+    protected TextInputLayout mLayoutEditId;
     protected EditText mEditId;
     protected Button mButtonConfirmed;
     protected ProgressBar mProgressBar;
 
-    public PostsFragment() {
-        // Required empty public constructor
-    }
+    public PostsFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -57,6 +60,7 @@ public class PostsFragment extends Fragment
         mTextTitle = (TextView) view.findViewById(R.id.text_title);
         mTextPost = (TextView) view.findViewById(R.id.text_post);
         mLayoutEnterId = view.findViewById(R.id.layout_id_enter);
+        mLayoutEditId = (TextInputLayout) view.findViewById(R.id.layout_edit_id);
         mEditId = (EditText) view.findViewById(R.id.edit_id);
         mButtonConfirmed = (Button) view.findViewById(R.id.button_confirmed);
         mProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
@@ -70,7 +74,7 @@ public class PostsFragment extends Fragment
         if (savedInstanceState != null) {
             mObjectId = savedInstanceState.getInt(Constants.Extras.OBJECT_ID);
         }
-        if (mObjectId != 0) {
+        if (mObjectId > mCategory.minId) {
             getLoaderManager().initLoader(mLoaderId, null, this);
         }
         mButtonConfirmed.setOnClickListener(new View.OnClickListener() {
@@ -79,6 +83,9 @@ public class PostsFragment extends Fragment
                 onButtonConfirmedClick();
             }
         });
+        mLayoutEditId.setHint(getString(R.string.hint_enter_post_id, mCategory.maxId));
+        mEditId.setFilters(new InputFilter[]
+                {new InputFilterMinMax(mCategory.minId, mCategory.maxId)});
         mEditId.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
