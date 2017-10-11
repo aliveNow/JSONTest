@@ -8,4 +8,5 @@
         <item>4</item>
         <item>5</item>
     </integer-array>
+    <integer name="photo_id">3</integer>
 </resources>

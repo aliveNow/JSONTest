@@ -14,6 +14,13 @@
         tools:context="ru.skypathway.jsontest.MainFragment">
 
         <fragment
+            android:id="@+id/fragment_photos"
+            android:name="ru.skypathway.jsontest.PhotosFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <fragment
             android:id="@+id/fragment_posts"
             android:name="ru.skypathway.jsontest.PostsFragment"
             android:layout_width="match_parent"

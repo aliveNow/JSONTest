@@ -17,6 +17,7 @@ import ru.skypathway.jsontest.utils.Constants;
 
 public class JSONConverter {
     public static final String TAG = JSONConverter.class.getSimpleName();
+    private static final String MESSAGE_JSON_EXCEPTION = "Failed to parse JSON";
 
     public static<T extends BaseObject> T getBaseObject(JSONObject jsonObject, Constants.CategoryEnum category) {
         if (jsonObject == null) {
@@ -26,8 +27,7 @@ public class JSONConverter {
             case POSTS: return (T) getPost(jsonObject);
             case COMMENTS: return (T) getComment(jsonObject);
             case USERS: return (T) getUser(jsonObject);
-            case PHOTOS:
-                break;
+            case PHOTOS: return (T) getPhoto(jsonObject);
             case TODOS:
                 break;
         }
@@ -53,7 +53,7 @@ public class JSONConverter {
             newObject.body = jsonObject.getString("body");
             return newObject;
         } catch (JSONException je) {
-            Log.e(TAG, "Failed to parse JSON", je);
+            Log.e(TAG, MESSAGE_JSON_EXCEPTION, je);
         }
         return null;
     }
@@ -67,7 +67,21 @@ public class JSONConverter {
             newObject.body = jsonObject.getString("body");
             return newObject;
         } catch (JSONException je) {
-            Log.e(TAG, "Failed to parse JSON", je);
+            Log.e(TAG, MESSAGE_JSON_EXCEPTION, je);
+        }
+        return null;
+    }
+
+    static Photo getPhoto(@NonNull JSONObject jsonObject) {
+        try {
+            Photo newObject = new Photo();
+            newObject.id = jsonObject.getInt("id");
+            newObject.title = jsonObject.getString("title");
+            newObject.url = jsonObject.getString("url");
+            newObject.thumbnailUrl = jsonObject.getString("thumbnailUrl");
+            return newObject;
+        } catch (JSONException je) {
+            Log.e(TAG, MESSAGE_JSON_EXCEPTION, je);
         }
         return null;
     }
@@ -80,7 +94,7 @@ public class JSONConverter {
             newObject.username = jsonObject.getString("username");
             return newObject;
         } catch (JSONException je) {
-            Log.e(TAG, "Failed to parse JSON", je);
+            Log.e(TAG, MESSAGE_JSON_EXCEPTION, je);
         }
         return null;
     }

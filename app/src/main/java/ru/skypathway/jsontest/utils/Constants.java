@@ -24,7 +24,10 @@ public class Constants {
     }
 
     public static class Loaders {
-        public static final int POSTS = CategoryEnum.POSTS.ordinal();
+        public static final int POST = CategoryEnum.POSTS.ordinal();
+        public static final int COMMENT = CategoryEnum.COMMENTS.ordinal();
+        public static final int PHOTO = CategoryEnum.PHOTOS.ordinal();
+        public static final int TODO = CategoryEnum.TODOS.ordinal();
         public static final int USERS = CategoryEnum.USERS.ordinal();
     }
 
