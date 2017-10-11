@@ -24,11 +24,12 @@ public class Constants {
     }
 
     public static class Loaders {
-        public static final int POSTS = 1;
-        public static final int USERS = 2;
+        public static final int POSTS = CategoryEnum.POSTS.ordinal();
+        public static final int USERS = CategoryEnum.USERS.ordinal();
     }
 
     public enum CategoryEnum {
+        NONE("", 0, 0),
         POSTS(Constants.POSTS, 1, 100),
         COMMENTS(Constants.COMMENTS, 1, 500),
         USERS(Constants.USERS, 1, 10),

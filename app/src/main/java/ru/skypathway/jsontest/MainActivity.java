@@ -22,8 +22,7 @@ import android.widget.TextView;
  */
 
 public class MainActivity extends AppCompatActivity
-        implements MainFragment.OnFragmentInteractionListener,
-        PostsFragment.OnFragmentInteractionListener {
+        implements MainFragment.OnFragmentInteractionListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
