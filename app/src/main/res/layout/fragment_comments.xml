@@ -3,20 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_view"
     style="@style/CardViewStyle"
-    tools:context="ru.skypathway.jsontest.PostsFragment">
+    tools:context="ru.skypathway.jsontest.CommentsFragment">
 
     <LinearLayout style="@style/LinearLayoutCardContent">
 
         <TextView
             android:id="@+id/text_card_title"
-            android:text="@string/title_item_posts"
+            android:text="@string/title_item_comments"
             style="@style/TextViewCardTitle" />
 
         <include layout="@layout/section_enter_id"/>
 
         <include layout="@layout/progress_bar"/>
 
-        <include layout="@layout/section_results_post"/>
+        <include layout="@layout/section_results_comment"/>
 
     </LinearLayout>
 

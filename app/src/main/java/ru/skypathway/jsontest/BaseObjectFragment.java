@@ -3,7 +3,6 @@ package ru.skypathway.jsontest;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -29,6 +28,8 @@ import ru.skypathway.jsontest.utils.Utils;
 
 public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         implements LoaderManager.LoaderCallbacks<T> {
+    private static final String TAG = BaseObjectFragment.class.getSimpleName();
+
     protected T mObject;
     protected int mObjectId;
     protected final Constants.CategoryEnum mCategory = getCategory();
@@ -64,38 +65,38 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     protected void onPrepareViews() {
         View view = getView();
         mLayoutResults = view.findViewById(R.id.layout_results);
+        Utils.requireNonNull(mLayoutResults, TAG +
+                " in view must be layout with id = layout_results");
         mLayoutEnterId = view.findViewById(R.id.layout_id_enter);
-        mLayoutEditId = (TextInputLayout) view.findViewById(R.id.layout_edit_id);
-        mEditId = (EditText) view.findViewById(R.id.edit_id);
-        mButtonConfirmed = (Button) view.findViewById(R.id.button_confirmed);
-        mProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
+        if (mLayoutEnterId != null) {
+            mLayoutEditId = (TextInputLayout) view.findViewById(R.id.layout_edit_id);
+            mEditId = (EditText) view.findViewById(R.id.edit_id);
+            mButtonConfirmed = (Button) view.findViewById(R.id.button_confirmed);
 
-        TextView textCardTitle = (TextView) view.findViewById(R.id.text_card_title);
-        textCardTitle.setText(getTitleId());
-
-        mButtonConfirmed.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onButtonConfirmedClick();
-            }
-        });
-        mEditId.setFilters(new InputFilter[]
-                {new InputFilterMinMax(mCategory.minId, mCategory.maxId)});
-        mEditId.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
+            mButtonConfirmed.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
                     onButtonConfirmedClick();
-                    return true;
                 }
-                return false;
-            }
-        });
+            });
+            mEditId.setFilters(new InputFilter[]
+                    {new InputFilterMinMax(mCategory.minId, mCategory.maxId)});
+            mEditId.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        onButtonConfirmedClick();
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        }
+        mProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
     }
 
     public abstract @NonNull Constants.CategoryEnum getCategory();
     protected abstract void onDataChange(T data);
-    protected abstract @StringRes int getTitleId();
 
     public int getLoaderId() {
         return mCategory.ordinal();
@@ -131,12 +132,16 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     }
 
     protected void showProgressBar() {
-        mProgressBar.setVisibility(View.VISIBLE);
+        if (mProgressBar != null) {
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
         mLayoutResults.setVisibility(View.GONE);
     }
 
     protected void hideProgressBar() {
-        mProgressBar.setVisibility(View.GONE);
+        if (mProgressBar != null) {
+            mProgressBar.setVisibility(View.GONE);
+        }
         mLayoutResults.setVisibility(mObject == null ? View.GONE : View.VISIBLE);
     }
 }

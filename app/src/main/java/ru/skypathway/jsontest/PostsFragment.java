@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import ru.skypathway.jsontest.data.dao.Post;
@@ -25,10 +24,7 @@ public class PostsFragment extends BaseObjectFragment<Post> {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.fragment_base_object, container, false);
-        LinearLayout placeHolder = (LinearLayout) view.findViewById(R.id.layout_results);
-        inflater.inflate(R.layout.content_results_post, placeHolder);
+        View view = inflater.inflate(R.layout.fragment_posts, container, false);
         return view;
     }
 
@@ -50,11 +46,6 @@ public class PostsFragment extends BaseObjectFragment<Post> {
     protected void onDataChange(Post data) {
         mTextTitle.setText(data.getTitle());
         mTextPost.setText(data.getBody());
-    }
-
-    @Override
-    protected int getTitleId() {
-        return R.string.title_item_posts;
     }
 
 }

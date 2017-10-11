@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import ru.skypathway.jsontest.data.dao.Comment;
@@ -28,9 +27,7 @@ public class CommentsFragment extends BaseObjectFragment<Comment> {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_base_object, container, false);
-        LinearLayout placeHolder = (LinearLayout) view.findViewById(R.id.layout_results);
-        inflater.inflate(R.layout.content_results_comment, placeHolder);
+        View view = inflater.inflate(R.layout.fragment_comments, container, false);
         return view;
     }
 
@@ -54,11 +51,6 @@ public class CommentsFragment extends BaseObjectFragment<Comment> {
         mTextName.setText(data.getName());
         mTextEmail.setText(data.getEmail());
         mTextComment.setText(data.getBody());
-    }
-
-    @Override
-    protected int getTitleId() {
-        return R.string.title_item_comments;
     }
 
 }
