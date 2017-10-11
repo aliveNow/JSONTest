@@ -19,6 +19,8 @@ public class Constants {
             return Constants.NAMESPACE_PREFIX + ".extra." + suffix;
         }
 
+        public static final String OBJECT_ID = createExtra("object_id");
+
     }
 
     public static class Loaders {

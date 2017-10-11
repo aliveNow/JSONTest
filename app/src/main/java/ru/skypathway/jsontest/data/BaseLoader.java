@@ -3,6 +3,7 @@ package ru.skypathway.jsontest.data;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
@@ -51,12 +52,21 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<D> {
         mObjectIds = objectIds;
     }
 
+    public void setObjectId(int objectId) {
+        this.mObjectIds = new int[]{objectId};
+    }
+
+    public void setObjectIds(int[] objectIds) {
+        this.mObjectIds = objectIds;
+    }
+
     @Override
     public D loadInBackground() {
         try {
             if (mObjectIds == null) {
                 return null;
             }
+            SystemClock.sleep(1000);
             List<String> resultStrings = new ArrayList<>();
             for (int objectId : mObjectIds) {
                 String url = Uri.parse(BASE_URL_STRING)
@@ -125,7 +135,7 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<D> {
         releaseCache();
     }
 
-    public void setCache(D mCache) {
+    protected void setCache(D mCache) {
         this.mCache = mCache;
     }
 

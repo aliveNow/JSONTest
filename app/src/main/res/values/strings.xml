@@ -10,4 +10,6 @@
     <string name="title_item_todos">TO DOs</string>
     <string name="title_text_name">Имя: </string>
     <string name="title_text_username">Имя пользователя: </string>
+    <string name="hint_enter_post_id">Введите id поста</string>
+    <string name="button_confirm">Подтвердить</string>
 </resources>
