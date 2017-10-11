@@ -3,6 +3,7 @@ package ru.skypathway.jsontest;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -68,6 +69,10 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         mEditId = (EditText) view.findViewById(R.id.edit_id);
         mButtonConfirmed = (Button) view.findViewById(R.id.button_confirmed);
         mProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
+
+        TextView textCardTitle = (TextView) view.findViewById(R.id.text_card_title);
+        textCardTitle.setText(getTitleId());
+
         mButtonConfirmed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,6 +95,7 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
 
     public abstract @NonNull Constants.CategoryEnum getCategory();
     protected abstract void onDataChange(T data);
+    protected abstract @StringRes int getTitleId();
 
     public int getLoaderId() {
         return mCategory.ordinal();

@@ -24,8 +24,7 @@ public class JSONConverter {
         }
         switch (category) {
             case POSTS: return (T) getPost(jsonObject);
-            case COMMENTS:
-                break;
+            case COMMENTS: return (T) getComment(jsonObject);
             case USERS: return (T) getUser(jsonObject);
             case PHOTOS:
                 break;
@@ -51,6 +50,20 @@ public class JSONConverter {
             Post newObject = new Post();
             newObject.id = jsonObject.getInt("id");
             newObject.title = jsonObject.getString("title");
+            newObject.body = jsonObject.getString("body");
+            return newObject;
+        } catch (JSONException je) {
+            Log.e(TAG, "Failed to parse JSON", je);
+        }
+        return null;
+    }
+
+    static Comment getComment(@NonNull JSONObject jsonObject) {
+        try {
+            Comment newObject = new Comment();
+            newObject.id = jsonObject.getInt("id");
+            newObject.name = jsonObject.getString("name");
+            newObject.email = jsonObject.getString("email");
             newObject.body = jsonObject.getString("body");
             return newObject;
         } catch (JSONException je) {

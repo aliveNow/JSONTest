@@ -21,6 +21,13 @@
             />
 
         <fragment
+            android:id="@+id/fragment_comments"
+            android:name="ru.skypathway.jsontest.CommentsFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <fragment
             android:id="@+id/fragment_users"
             android:name="ru.skypathway.jsontest.UsersFragment"
             android:layout_width="match_parent"
