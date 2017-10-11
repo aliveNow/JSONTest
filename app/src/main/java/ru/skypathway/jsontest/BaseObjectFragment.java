@@ -25,7 +25,6 @@ import ru.skypathway.jsontest.utils.Utils;
 /**
  * Created by samsmariya on 11.10.17.
  */
-
 public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         implements LoaderManager.LoaderCallbacks<T> {
     private static final String TAG = BaseObjectFragment.class.getSimpleName();
@@ -98,6 +97,10 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     public abstract @NonNull Constants.CategoryEnum getCategory();
     protected abstract void onDataChange(T data);
 
+    protected boolean willContinueLoadData(T data){
+        return false;
+    }
+
     public int getLoaderId() {
         return mCategory.ordinal();
     }
@@ -115,7 +118,9 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     public void onLoadFinished(Loader<T> loader, T data) {
         mObject = data;
         onDataChange(data);
-        hideProgressBar();
+        if (!willContinueLoadData(data)) {
+            hideProgressBar();
+        }
     }
 
     @Override

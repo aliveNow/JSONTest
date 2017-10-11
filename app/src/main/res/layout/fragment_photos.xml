@@ -14,7 +14,7 @@
 
         <include layout="@layout/progress_bar"/>
 
-        <include layout="@layout/section_results_post"/>
+        <include layout="@layout/section_results_photo"/>
 
     </LinearLayout>
 

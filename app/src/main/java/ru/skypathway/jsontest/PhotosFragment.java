@@ -6,7 +6,11 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import ru.skypathway.jsontest.data.dao.Photo;
 import ru.skypathway.jsontest.utils.Constants;
@@ -15,10 +19,11 @@ import ru.skypathway.jsontest.utils.Constants;
 /**
  * Created by samsmariya on 11.10.17.
  */
-public class PhotosFragment extends BaseObjectFragment<Photo> {
+public class PhotosFragment extends BaseObjectFragment<Photo>
+        implements Callback {
 
     private TextView mTextTitle;
-    private TextView mTextPost;
+    private ImageView mImageView;
 
     public PhotosFragment() {}
 
@@ -42,7 +47,7 @@ public class PhotosFragment extends BaseObjectFragment<Photo> {
         super.onPrepareViews();
         View view = getView();
         mTextTitle = (TextView) view.findViewById(R.id.text_title);
-        mTextPost = (TextView) view.findViewById(R.id.text_post);
+        mImageView = (ImageView) view.findViewById(R.id.image_view);
     }
 
     @Override
@@ -53,8 +58,29 @@ public class PhotosFragment extends BaseObjectFragment<Photo> {
     @Override
     protected void onDataChange(Photo data) {
         mTextTitle.setText(data.getTitle());
-        mTextPost.setText(data.getUrl());
     }
 
+    @Override
+    protected boolean willContinueLoadData(Photo data) {
+        if (data != null && data.getUrl() != null) {
+            Picasso.with(getActivity())
+                    .load(data.getUrl())
+                    .into(mImageView, this);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onSuccess() {
+        mImageView.setVisibility(View.VISIBLE);
+        hideProgressBar();
+    }
+
+    @Override
+    public void onError() {
+        mImageView.setVisibility(View.GONE);
+        hideProgressBar();
+    }
 }
 
