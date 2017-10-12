@@ -10,7 +10,13 @@
     <string name="title_item_todos">TO DOs</string>
     <string name="title_text_name">Имя: </string>
     <string name="title_text_username">Имя пользователя: </string>
-    <string name="hint_enter_post_id">Введите id поста (&lt; %1$d)</string>
-    <string name="hint_enter_comment_id">Введите id комментария (&lt; %1$d)</string>
+    <string name="hint_enter_object_id">Введите id %2$s (&lt; %1$d)</string>
     <string name="button_confirm">Подтвердить</string>
+    <string name="button_try_again">Попробовать еще раз</string>
+    <string name="msg_loading_failed">Загрузка %1$s с id = %2$d не удалась.</string>
+    <string name="arg_post_genitive">поста</string>
+    <string name="arg_comment_genitive">комментария</string>
+    <string name="arg_photo_genitive">фотографии</string>
+    <string name="arg_user_genitive">пользователя</string>
+    <string name="arg_todo_genitive">to do</string>
 </resources>

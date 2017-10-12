@@ -14,6 +14,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import ru.skypathway.jsontest.data.ArrayLoader;
+import ru.skypathway.jsontest.data.BaseLoader.LoaderResult;
 import ru.skypathway.jsontest.data.dao.User;
 import ru.skypathway.jsontest.utils.Constants;
 
@@ -21,7 +22,8 @@ import ru.skypathway.jsontest.utils.Constants;
 /**
  * Created by samsmariya on 10.10.17.
  */
-public class UsersFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<User>> {
+public class UsersFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<LoaderResult<List<User>>> {
     protected RecyclerView mRecyclerView;
     protected UsersAdapter mUsersAdapter;
 
@@ -47,19 +49,19 @@ public class UsersFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
     @Override
-    public Loader<List<User>> onCreateLoader(int id, Bundle args) {
+    public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
         return new ArrayLoader<>(getActivity(),
                 Constants.CategoryEnum.USERS,
                 getResources().getIntArray(R.array.user_ids));
     }
 
     @Override
-    public void onLoadFinished(Loader<List<User>> loader, List<User> data) {
-        mUsersAdapter.setUsers(data);
+    public void onLoadFinished(Loader<LoaderResult<List<User>>> loader, LoaderResult<List<User>> data) {
+        mUsersAdapter.setUsers(data.getResult());
     }
 
     @Override
-    public void onLoaderReset(Loader<List<User>> loader) {
+    public void onLoaderReset(Loader<LoaderResult<List<User>>> loader) {
         mUsersAdapter.setUsers(null);
     }
 

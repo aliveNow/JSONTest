@@ -13,6 +13,8 @@ public class Constants {
     public static final String PHOTOS = "photos";
     public static final String TODOS = "todos";
 
+    public static final int CONNECTION_TIMEOUT = 10000;
+
     public static class Extras {
 
         private static String createExtra(String suffix){

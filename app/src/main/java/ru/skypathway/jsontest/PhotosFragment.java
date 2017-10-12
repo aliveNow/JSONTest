@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import ru.skypathway.jsontest.data.BaseLoader.LoaderResult;
 import ru.skypathway.jsontest.data.dao.Photo;
 import ru.skypathway.jsontest.utils.Constants;
 
@@ -56,15 +57,18 @@ public class PhotosFragment extends BaseObjectFragment<Photo>
     }
 
     @Override
-    protected void onDataChange(Photo data) {
-        mTextTitle.setText(data.getTitle());
+    protected void onDataObjectChange(Photo data) {
+        if (data != null) {
+            mTextTitle.setText(data.getTitle());
+        }
     }
 
     @Override
-    protected boolean willContinueLoadData(Photo data) {
-        if (data != null && data.getUrl() != null) {
+    protected boolean willContinueLoadData(LoaderResult<Photo> data) {
+        Photo result = data.getResult();
+        if (result != null && result.getUrl() != null) {
             Picasso.with(getActivity())
-                    .load(data.getUrl())
+                    .load(result.getUrl())
                     .into(mImageView, this);
             return true;
         }

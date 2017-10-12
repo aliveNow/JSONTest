@@ -28,7 +28,7 @@ import ru.skypathway.jsontest.utils.Constants;
  * https://developer.android.com/reference/android/content/AsyncTaskLoader.html
  */
 
-public abstract class BaseLoader<D> extends AsyncTaskLoader<D> {
+public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderResult<D>> {
     private static final String TAG = BaseLoader.class.getSimpleName();
     public static final String BASE_URL_STRING = "https://jsonplaceholder.typicode.com/";
 
@@ -52,21 +52,14 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<D> {
         mObjectIds = objectIds;
     }
 
-    public void setObjectId(int objectId) {
-        this.mObjectIds = new int[]{objectId};
-    }
-
-    public void setObjectIds(int[] objectIds) {
-        this.mObjectIds = objectIds;
-    }
-
     @Override
-    public D loadInBackground() {
+    public LoaderResult<D> loadInBackground() {
+        LoaderResult loaderResult = null;
         try {
             if (mObjectIds == null) {
                 return null;
             }
-            SystemClock.sleep(1000);
+            SystemClock.sleep(3000);
             List<String> resultStrings = new ArrayList<>();
             for (int objectId : mObjectIds) {
                 String url = Uri.parse(BASE_URL_STRING)
@@ -79,15 +72,18 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<D> {
                     resultStrings.add(string);
                 }
             }
-            D result = convertToResult(resultStrings);
-            setCache(result);
-            return result;
-        } catch (IOException ioe) {
+            D resultObject = convertToResult(resultStrings);
+            setCache(resultObject);
+            loaderResult = new LoaderResult<>(resultObject, null);
+        }catch (Exception exception) {
+            Log.e(TAG, "Failed ", exception);
+            loaderResult = new LoaderResult<>(null, exception);
+        }/* catch (IOException ioe) {
             Log.e(TAG, "Failed ", ioe);
         }catch (JSONException je){
             Log.e(TAG, "Failed to parse JSON", je);
-        }
-        return null;
+        } */
+        return loaderResult;
     }
 
     protected abstract D convertToResult(@NonNull List<String> strings) throws JSONException;
@@ -99,7 +95,7 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<D> {
         if (mCache != null) {
             // If we currently have a result available, deliver it
             // immediately.
-            deliverResult(mCache);
+            deliverResult(new LoaderResult<>(mCache, null));
         }
 
         if (takeContentChanged() || mCache == null) {
@@ -120,7 +116,7 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<D> {
     /**
      * Handles a request to cancel a load.
      */
-    @Override public void onCanceled(D data) {
+    @Override public void onCanceled(LoaderResult<D> data) {
         super.onCanceled(data);
         releaseCache();
     }
@@ -146,6 +142,7 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<D> {
     public String getUrlString(String urlSpec) throws IOException {
         URL url = new URL(urlSpec);
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        connection.setConnectTimeout(5000); //(Constants.CONNECTION_TIMEOUT);
         // TODO: 10.10.17 java 7 и try с ресурсами
         try {
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
@@ -162,6 +159,24 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<D> {
             return sb.toString();
         } finally {
             connection.disconnect();
+        }
+    }
+
+    public static class LoaderResult<T> {
+        private final T result;
+        private final Exception error;
+
+        public LoaderResult(T result, Exception error) {
+            this.result = result;
+            this.error = error;
+        }
+
+        public T getResult() {
+            return result;
+        }
+
+        public Exception getError() {
+            return error;
         }
     }
 }

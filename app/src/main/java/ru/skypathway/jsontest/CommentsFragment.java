@@ -3,7 +3,6 @@ package ru.skypathway.jsontest;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,7 @@ import ru.skypathway.jsontest.utils.Constants;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * Created by samsmariya on 11.10.17.
  */
 public class CommentsFragment extends BaseObjectFragment<Comment> {
 
@@ -34,11 +33,9 @@ public class CommentsFragment extends BaseObjectFragment<Comment> {
     @Override
     protected void onPrepareViews() {
         super.onPrepareViews();
-        View view = getView();
-        mTextName = (TextView) view.findViewById(R.id.text_name);
-        mTextEmail = (TextView) view.findViewById(R.id.text_email);
-        mTextComment = (TextView) view.findViewById(R.id.text_comment);
-        mLayoutEditId.setHint(getString(R.string.hint_enter_comment_id, mCategory.maxId));
+        mTextName = findViewById(R.id.text_name);
+        mTextEmail = findViewById(R.id.text_email);
+        mTextComment = findViewById(R.id.text_comment);
     }
 
     @Override
@@ -47,10 +44,12 @@ public class CommentsFragment extends BaseObjectFragment<Comment> {
     }
 
     @Override
-    protected void onDataChange(Comment data) {
-        mTextName.setText(data.getName());
-        mTextEmail.setText(data.getEmail());
-        mTextComment.setText(data.getBody());
+    protected void onDataObjectChange(Comment data) {
+        if (data != null) {
+            mTextName.setText(data.getName());
+            mTextEmail.setText(data.getEmail());
+            mTextComment.setText(data.getBody());
+        }
     }
 
 }

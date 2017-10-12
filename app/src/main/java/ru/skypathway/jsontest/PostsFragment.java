@@ -31,10 +31,8 @@ public class PostsFragment extends BaseObjectFragment<Post> {
     @Override
     protected void onPrepareViews() {
         super.onPrepareViews();
-        View view = getView();
-        mTextTitle = (TextView) view.findViewById(R.id.text_title);
-        mTextPost = (TextView) view.findViewById(R.id.text_post);
-        mLayoutEditId.setHint(getString(R.string.hint_enter_post_id, mCategory.maxId));
+        mTextTitle = findViewById(R.id.text_title);
+        mTextPost = findViewById(R.id.text_post);
     }
 
     @Override
@@ -43,9 +41,11 @@ public class PostsFragment extends BaseObjectFragment<Post> {
     }
 
     @Override
-    protected void onDataChange(Post data) {
-        mTextTitle.setText(data.getTitle());
-        mTextPost.setText(data.getBody());
+    protected void onDataObjectChange(Post data) {
+        if (data != null) {
+            mTextTitle.setText(data.getTitle());
+            mTextPost.setText(data.getBody());
+        }
     }
 
 }
