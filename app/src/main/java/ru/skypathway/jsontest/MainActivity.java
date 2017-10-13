@@ -1,6 +1,5 @@
 package ru.skypathway.jsontest;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -19,8 +18,7 @@ import ru.skypathway.jsontest.utils.ExceptionWrapper;
  */
 
 public class MainActivity extends AppCompatActivity
-        implements MainFragment.OnFragmentInteractionListener,
-        BaseObjectFragment.BaseObjectFragmentDelegate,
+        implements BaseObjectFragment.BaseObjectFragmentDelegate,
         BaseObjectFragment.BaseObjectFragmentListener{
     public static final String TAG = MainActivity.class.getSimpleName();
 
@@ -43,11 +41,6 @@ public class MainActivity extends AppCompatActivity
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
     }
 
     @Override
