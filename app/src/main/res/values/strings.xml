@@ -8,8 +8,10 @@
     <string name="title_item_users">Пользователи</string>
     <string name="title_item_photos">Фотографии</string>
     <string name="title_item_todos">TO DOs</string>
-    <string name="title_text_name">Имя: </string>
-    <string name="title_text_username">Имя пользователя: </string>
+    <string name="title_user_name">Имя: </string>
+    <string name="title_user_username">Имя пользователя: </string>
+    <string name="title_contact_email">Email:</string>
+    <string name="title_contact_fio">ФИО:</string>
     <string name="hint_enter_object_id">Введите id %2$s (&lt; %1$d)</string>
     <string name="button_confirm">Подтвердить</string>
     <string name="button_try_again">Попробовать еще раз</string>
@@ -22,4 +24,6 @@
     <string name="error_network_not_available">Нет доступного интернет-соединения.</string>
     <string name="msg_network_not_available">Нет доступного интернет-соединения.
         Пожалуйста, проверьте интернет-соединение и попробуйте еще раз. </string>
+    <string name="tab_title_main">Главная</string>
+    <string name="tab_contacts_name">Контакты</string>
 </resources>

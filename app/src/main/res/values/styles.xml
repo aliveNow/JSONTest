@@ -64,4 +64,8 @@
         <item name="android:paddingBottom">@dimen/padding_normal</item>
     </style>
 
+    <style name="TextViewGridText.WithPadding">
+        <item name="android:paddingBottom">@dimen/padding_normal</item>
+    </style>
+
 </resources>

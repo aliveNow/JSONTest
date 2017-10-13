@@ -8,13 +8,13 @@
     android:useDefaultMargins="true">
     <TextView
         style="@style/TextViewGridTitle"
-        android:text="@string/title_text_name" />
+        android:text="@string/title_user_name" />
     <TextView
         android:id="@+id/text_name"
         style="@style/TextViewGridText"/>
     <TextView
         style="@style/TextViewGridTitle"
-        android:text="@string/title_text_username" />
+        android:text="@string/title_user_username" />
     <TextView
         android:id="@+id/text_username"
         style="@style/TextViewGridText"/>
