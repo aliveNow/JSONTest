@@ -6,12 +6,7 @@
     android:scrollbars="vertical"
     tools:context="ru.skypathway.jsontest.MainFragment">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:focusable="true"
-        android:focusableInTouchMode="true">
+    <LinearLayout style="@style/LinearLayoutFragmentsContainer">
 
         <include layout="@layout/card_error"/>
 

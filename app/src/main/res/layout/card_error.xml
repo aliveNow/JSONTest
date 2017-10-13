@@ -5,7 +5,8 @@
     app:cardBackgroundColor="@color/errorBackgroundColor">
 
     <LinearLayout
-        style="@style/LinearLayoutSectionContainer">
+        style="@style/LinearLayoutSectionContainer"
+        android:padding="@dimen/padding_normal">
 
         <LinearLayout
             android:layout_width="match_parent"

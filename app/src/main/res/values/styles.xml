@@ -36,6 +36,10 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
+    <style name="TextViewGridText.WithPadding">
+        <item name="android:paddingBottom">@dimen/padding_normal</item>
+    </style>
+
     <style name="TextViewCardTitle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -64,8 +68,13 @@
         <item name="android:paddingBottom">@dimen/padding_normal</item>
     </style>
 
-    <style name="TextViewGridText.WithPadding">
-        <item name="android:paddingBottom">@dimen/padding_normal</item>
+    <style name="LinearLayoutFragmentsContainer">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">@dimen/padding_half_normal</item>
+        <item name="android:divider">@drawable/empty_list_divider</item>
+        <item name="android:showDividers">middle</item>
     </style>
 
 </resources>
