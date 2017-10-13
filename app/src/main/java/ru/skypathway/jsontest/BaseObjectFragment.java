@@ -9,6 +9,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.view.KeyEvent;
 import android.view.View;
@@ -24,6 +25,7 @@ import ru.skypathway.jsontest.data.dao.BaseObject;
 import ru.skypathway.jsontest.utils.Constants;
 import ru.skypathway.jsontest.utils.ExceptionWrapper;
 import ru.skypathway.jsontest.utils.InputFilterMinMax;
+import ru.skypathway.jsontest.utils.TextChangedListener;
 import ru.skypathway.jsontest.utils.Utils;
 
 /**
@@ -31,7 +33,8 @@ import ru.skypathway.jsontest.utils.Utils;
  */
 public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         implements LoaderManager.LoaderCallbacks<LoaderResult<T>>,
-        View.OnFocusChangeListener {
+        View.OnFocusChangeListener,
+        TextView.OnEditorActionListener {
     private static final String TAG = BaseObjectFragment.class.getSimpleName();
 
     protected BaseObjectFragmentDelegate mDelegate;
@@ -99,12 +102,6 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         mListener = null;
     }
 
-    public void onFocusChange(View v, boolean hasFocus) {
-        if (hasFocus) {
-            mListener.onFragmentGetFocus(this, v);
-        }
-    }
-
     protected void onPrepareViews() {
         mLayoutResults = findViewById(R.id.layout_results);
         Utils.requireNonNull(mLayoutResults, TAG +
@@ -114,7 +111,7 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
             mLayoutEditId = findViewById(R.id.layout_edit_id);
             mEditId = findViewById(R.id.edit_id);
             mButtonConfirmed = findViewById(R.id.button_confirmed);
-
+            mButtonConfirmed.setEnabled(false);
             mButtonConfirmed.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -126,14 +123,11 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
                     Utils.getCategoryNameGenitive(getActivity(), mCategory)));
             mEditId.setFilters(new InputFilter[]
                     {new InputFilterMinMax(mCategory.minId, mCategory.maxId)});
-            mEditId.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            mEditId.setOnEditorActionListener(this);
+            mEditId.addTextChangedListener(new TextChangedListener<EditText>(mEditId){
                 @Override
-                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                    if (actionId == EditorInfo.IME_ACTION_DONE) {
-                        onButtonConfirmedClick();
-                        return true;
-                    }
-                    return false;
+                public void onTextChanged(EditText target, Editable s) {
+                    mButtonConfirmed.setEnabled(s.length() > 0);
                 }
             });
             mEditId.setOnFocusChangeListener(this);
@@ -154,6 +148,21 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
 
         mProgressBar = findViewById(R.id.progress_bar);
         hideProgressBar();
+    }
+
+    public void onFocusChange(View v, boolean hasFocus) {
+        if (hasFocus) {
+            mListener.onFragmentGetFocus(this, v);
+        }
+    }
+
+    @Override
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+            onButtonConfirmedClick();
+            return true;
+        }
+        return false;
     }
 
     protected<T> T findViewById(@IdRes int viewId) {

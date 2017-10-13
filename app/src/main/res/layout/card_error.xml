@@ -10,8 +10,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="@dimen/padding_half_normal">
+            android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -29,15 +28,6 @@
                 android:textAppearance="?android:textAppearanceMedium" />
 
         </LinearLayout>
-
-        <Button
-            android:id="@+id/button_try_again"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_try_again"
-            android:layout_gravity="center_horizontal"
-            android:padding="@dimen/padding_normal"
-            android:visibility="gone"/>
 
     </LinearLayout>
 
