@@ -1,9 +1,7 @@
 package ru.skypathway.jsontest;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
+import android.support.annotation.NonNull;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,48 +21,47 @@ import ru.skypathway.jsontest.utils.DividerItemDecoration;
 /**
  * Created by samsmariya on 10.10.17.
  */
-public class UsersFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<LoaderResult<List<User>>> {
+public class UsersFragment extends BaseObjectFragment<List<User>> {
     protected RecyclerView mRecyclerView;
     protected UsersAdapter mUsersAdapter;
 
-    public UsersFragment() {
-        // Required empty public constructor
-    }
+    public UsersFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_users, container, false);
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         return view;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    protected void onPrepareViews(Bundle savedInstanceState) {
+        super.onPrepareViews(savedInstanceState);
+        mRecyclerView = findViewById(R.id.recycler_view);
         mRecyclerView.setNestedScrollingEnabled(false);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity()));
         mUsersAdapter = new UsersAdapter(null);
         mRecyclerView.setAdapter(mUsersAdapter);
-        getLoaderManager().initLoader(Constants.Loaders.USERS, null, this);
+        if (savedInstanceState == null) {
+            mObjectIds = getResources().getIntArray(R.array.user_ids);
+        }
     }
 
     @Override
-    public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
+    public @NonNull Constants.CategoryEnum getCategory() {
+        return Constants.CategoryEnum.USERS;
+    }
+
+    @Override
+    protected void onDataObjectChange(List<User> data) {
+        mUsersAdapter.setUsers(data);
+    }
+
+    @Override
+    protected Loader<LoaderResult<List<User>>> getNewLoader(Bundle args) {
         return new ArrayLoader<>(getActivity(),
                 Constants.CategoryEnum.USERS,
-                getResources().getIntArray(R.array.user_ids));
-    }
-
-    @Override
-    public void onLoadFinished(Loader<LoaderResult<List<User>>> loader, LoaderResult<List<User>> data) {
-        mUsersAdapter.setUsers(data.getResult());
-    }
-
-    @Override
-    public void onLoaderReset(Loader<LoaderResult<List<User>>> loader) {
-        mUsersAdapter.setUsers(null);
+                mObjectIds);
     }
 
     private static class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {

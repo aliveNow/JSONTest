@@ -2,6 +2,7 @@ package ru.skypathway.jsontest.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.inputmethod.InputMethodManager;
 
 import ru.skypathway.jsontest.R;
@@ -25,29 +26,44 @@ public class Utils {
         imm.hideSoftInputFromWindow(context.getCurrentFocus().getWindowToken(), 0);
     }
 
-    // FIXME: 12.10.17 rename and add all strings
+    public static boolean isEmptyArray(int[] array) {
+        if (array == null || array.length == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static @NonNull String arrayToString(String delimiter, int[] array) {
+        // увы TextUtils.join(",", array) на int[] не работает(
+        if (isEmptyArray(array)) {
+            return "";
+        }
+        if (array.length == 1) {
+            return Integer.toString(array[0]);
+        }
+        StringBuilder builder = new StringBuilder();
+        for (int i : array) {
+            builder.append(i).append(delimiter+" ");
+        }
+        builder.delete(builder.length()-(delimiter.length()+1), builder.length());
+        return builder.toString();
+    }
+
     public static String getCategoryNameGenitive(Context context, Constants.CategoryEnum category) {
+        return getCategoryNameGenitive(context, category, 1);
+    }
+
+    public static String getCategoryNameGenitive(Context context, Constants.CategoryEnum category, int size) {
         int strId = 0;
         switch (category) {
-            case NONE:
-                break;
-            case POSTS:
-                strId = R.string.arg_post_genitive;
-                break;
-            case COMMENTS:
-                strId = R.string.arg_comment_genitive;
-                break;
-            case USERS:
-                strId = R.string.arg_user_genitive;
-                break;
-            case PHOTOS:
-                strId = R.string.arg_photo_genitive;
-                break;
-            case TODOS:
-                strId = R.string.arg_todo_genitive;
-                break;
+            case NONE: break;
+            case POSTS: strId = R.plurals.plurals_post; break;
+            case COMMENTS: strId = R.plurals.plurals_comment;break;
+            case USERS: strId = R.plurals.plurals_user; break;
+            case PHOTOS: strId = R.plurals.plurals_photos; break;
+            case TODOS: strId = R.plurals.plurals_todos; break;
         }
-        return strId > 0 ? context.getResources().getString(strId) : null;
+        return strId > 0 ? context.getResources().getQuantityString(strId, size) : null;
     }
 
 }

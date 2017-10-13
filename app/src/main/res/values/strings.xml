@@ -9,21 +9,60 @@
     <string name="title_item_photos">Фотографии</string>
     <string name="title_item_todos">TO DOs</string>
     <string name="title_user_name">Имя: </string>
-    <string name="title_user_username">Имя пользователя: </string>
+    <string name="title_user_username">Логин: </string>
     <string name="title_contact_email">Email:</string>
     <string name="title_contact_fio">ФИО:</string>
     <string name="hint_enter_object_id">Введите id %2$s (&lt; %1$d)</string>
     <string name="button_confirm">Подтвердить</string>
     <string name="button_try_again">Попробовать еще раз</string>
-    <string name="msg_loading_failed">Загрузка %1$s с id = %2$d не удалась.</string>
-    <string name="arg_post_genitive">поста</string>
-    <string name="arg_comment_genitive">комментария</string>
-    <string name="arg_photo_genitive">фотографии</string>
-    <string name="arg_user_genitive">пользователя</string>
-    <string name="arg_todo_genitive">to do</string>
-    <string name="error_network_not_available">Нет доступного интернет-соединения.</string>
-    <string name="msg_network_not_available">Нет доступного интернет-соединения.
+    <string name="msg_loading_failed">Загрузка %1$s с %2$s = %3$s не удалась.</string>
+    <string name="error_network_not_available">Вы не подключены к интернету.</string>
+    <string name="msg_network_not_available">Вы не подключены к интернету.
         Пожалуйста, проверьте интернет-соединение и попробуйте еще раз. </string>
     <string name="tab_title_main">Главная</string>
     <string name="tab_contacts_name">Контакты</string>
+
+    <string name="posts_genitive">постов</string>
+    <string name="comments_genitive">комментариев</string>
+    <string name="photos_genitive">фотографий</string>
+    <string name="users_genitive">пользователей</string>
+    <string name="todos_genitive">to dos</string>
+    <string name="ids_genitive">ids</string>
+
+    <plurals name="plurals_user">
+        <item quantity="one">пользователя</item>
+        <item quantity="two">@string/users_genitive</item>
+        <item quantity="many">@string/users_genitive</item>
+        <item quantity="other">@string/users_genitive</item>
+    </plurals>
+    <plurals name="plurals_post">
+        <item quantity="one">поста</item>
+        <item quantity="two">@string/posts_genitive</item>
+        <item quantity="many">@string/posts_genitive</item>
+        <item quantity="other">@string/posts_genitive</item>
+    </plurals>
+    <plurals name="plurals_comment">
+        <item quantity="one">комментария</item>
+        <item quantity="two">@string/comments_genitive</item>
+        <item quantity="many">@string/comments_genitive</item>
+        <item quantity="other">@string/comments_genitive</item>
+    </plurals>
+    <plurals name="plurals_photos">
+        <item quantity="one">фотографии</item>
+        <item quantity="two">@string/photos_genitive</item>
+        <item quantity="many">@string/photos_genitive</item>
+        <item quantity="other">@string/photos_genitive</item>
+    </plurals>
+    <plurals name="plurals_todos">
+        <item quantity="one">to do</item>
+        <item quantity="two">@string/todos_genitive</item>
+        <item quantity="many">@string/todos_genitive</item>
+        <item quantity="other">@string/todos_genitive</item>
+    </plurals>
+    <plurals name="plurals_ids">
+        <item quantity="one">id</item>
+        <item quantity="two">@string/ids_genitive</item>
+        <item quantity="many">@string/ids_genitive</item>
+        <item quantity="other">@string/ids_genitive</item>
+    </plurals>
 </resources>

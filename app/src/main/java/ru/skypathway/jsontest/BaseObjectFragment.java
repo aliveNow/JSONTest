@@ -20,8 +20,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import ru.skypathway.jsontest.data.BaseLoader.LoaderResult;
-import ru.skypathway.jsontest.data.ObjectLoader;
-import ru.skypathway.jsontest.data.dao.BaseObject;
 import ru.skypathway.jsontest.utils.Constants;
 import ru.skypathway.jsontest.utils.ExceptionWrapper;
 import ru.skypathway.jsontest.utils.InputFilterMinMax;
@@ -31,7 +29,7 @@ import ru.skypathway.jsontest.utils.Utils;
 /**
  * Created by samsmariya on 11.10.17.
  */
-public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
+public abstract class BaseObjectFragment<T> extends Fragment
         implements LoaderManager.LoaderCallbacks<LoaderResult<T>>,
         View.OnFocusChangeListener,
         TextView.OnEditorActionListener {
@@ -41,7 +39,7 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     protected BaseObjectFragmentListener mListener;
 
     protected T mObject;
-    protected int mObjectId;
+    protected int[] mObjectIds;
     protected final Constants.CategoryEnum mCategory = getCategory();
 
     protected ExceptionWrapper mLoadingError;
@@ -63,11 +61,11 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        onPrepareViews();
+        onPrepareViews(savedInstanceState);
         if (savedInstanceState != null) {
-            mObjectId = savedInstanceState.getInt(Constants.Extras.OBJECT_ID);
+            mObjectIds = savedInstanceState.getIntArray(Constants.Extras.OBJECT_IDS);
         }
-        if (mObjectId > mCategory.minId) {
+        if (!Utils.isEmptyArray(mObjectIds)) {
             getLoaderManager().initLoader(getLoaderId(), null, this);
         }
     }
@@ -75,7 +73,7 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(Constants.Extras.OBJECT_ID, mObjectId);
+        outState.putIntArray(Constants.Extras.OBJECT_IDS, mObjectIds);
     }
 
     @Override
@@ -102,7 +100,7 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         mListener = null;
     }
 
-    protected void onPrepareViews() {
+    protected void onPrepareViews(Bundle savedInstanceState) {
         mLayoutResults = findViewById(R.id.layout_results);
         Utils.requireNonNull(mLayoutResults, TAG +
                 " in view must be layout with id = layout_results");
@@ -169,6 +167,13 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         return (T) getView().findViewById(viewId);
     }
 
+    protected int getFirstObjectId() {
+        if (!Utils.isEmptyArray(mObjectIds)) {
+            return mObjectIds[0];
+        }
+        return 0;
+    }
+
     public abstract @NonNull Constants.CategoryEnum getCategory();
     protected abstract void onDataObjectChange(T data);
 
@@ -179,12 +184,13 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     public int getLoaderId() {
         return mCategory.ordinal();
     }
+    protected abstract Loader<LoaderResult<T>> getNewLoader(Bundle args);
 
     @Override
     public Loader<LoaderResult<T>> onCreateLoader(int id, Bundle args) {
         if (id == getLoaderId()) {
             showProgressBar();
-            return new ObjectLoader<>(getActivity(), mCategory, mObjectId);
+            return getNewLoader(args);
         }
         return null;
     }
@@ -196,11 +202,13 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
             onDataObjectChange(mObject);
         }
         if (data.getError() != null) {
-            String errorStr = getResources().getString(R.string.msg_loading_failed,
-                    Utils.getCategoryNameGenitive(getActivity(), mCategory),
-                    mObjectId);
-            mLoadingError = new ExceptionWrapper(data.getError(),
-                    errorStr);
+            String errorStr;
+            String categoryName = Utils.getCategoryNameGenitive(getActivity(), mCategory, mObjectIds.length);
+            errorStr = getResources().getString(R.string.msg_loading_failed,
+                    categoryName,
+                    getResources().getQuantityString(R.plurals.plurals_ids, mObjectIds.length),
+                    Utils.arrayToString(",", mObjectIds));
+            mLoadingError = new ExceptionWrapper(data.getError(), errorStr);
             mDelegate.onFragmentObjectLoadingException(this, mLoadingError);
             onLoaderError(mLoadingError);
         }else {
@@ -229,7 +237,7 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
             objId = Integer.parseInt(mEditId.getText().toString());
         }catch (NumberFormatException nfe) {}
         if (objId > 0) {
-            mObjectId = objId;
+            mObjectIds = new int[]{objId};
             Utils.hideSoftInputKeyboard(getActivity());
             mEditId.clearFocus();
             getLoaderManager().restartLoader(getLoaderId(), null, this);
