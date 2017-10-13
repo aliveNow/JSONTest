@@ -1,5 +1,6 @@
 package ru.skypathway.jsontest;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -21,6 +22,7 @@ import ru.skypathway.jsontest.data.BaseLoader.LoaderResult;
 import ru.skypathway.jsontest.data.ObjectLoader;
 import ru.skypathway.jsontest.data.dao.BaseObject;
 import ru.skypathway.jsontest.utils.Constants;
+import ru.skypathway.jsontest.utils.ExceptionWrapper;
 import ru.skypathway.jsontest.utils.InputFilterMinMax;
 import ru.skypathway.jsontest.utils.Utils;
 
@@ -31,11 +33,12 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         implements LoaderManager.LoaderCallbacks<LoaderResult<T>> {
     private static final String TAG = BaseObjectFragment.class.getSimpleName();
 
+    protected BaseObjectFragmentDelegate mDelegate;
     protected T mObject;
     protected int mObjectId;
     protected final Constants.CategoryEnum mCategory = getCategory();
 
-    protected LoadingError mLoadingError;
+    protected ExceptionWrapper mLoadingError;
 
     protected View mLayoutResults;
     protected View mLayoutEnterId;
@@ -67,6 +70,23 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(Constants.Extras.OBJECT_ID, mObjectId);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof MainFragment.OnFragmentInteractionListener) {
+            mDelegate = (BaseObjectFragmentDelegate) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement BaseObjectFragmentDelegate");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mDelegate = null;
     }
 
     protected void onPrepareViews() {
@@ -146,10 +166,19 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     @Override
     public void onLoadFinished(Loader<LoaderResult<T>> loader, LoaderResult<T> data) {
         mObject = data.getResult();
-        onDataObjectChange(mObject);
-        mLoadingError = data.getError() == null ? null : new LoadingError(data.getError());
-        if (mLoadingError != null) {
+        if (!mDelegate.onFragmentObjectLoadFinished(this, mObject)) {
+            onDataObjectChange(mObject);
+        }
+        if (data.getError() != null) {
+            String errorStr = getResources().getString(R.string.msg_loading_failed,
+                    Utils.getCategoryNameGenitive(getActivity(), mCategory),
+                    mObjectId);
+            mLoadingError = new ExceptionWrapper(data.getError(),
+                    errorStr);
+            mDelegate.onFragmentObjectLoadingException(this, mLoadingError);
             onLoaderError(mLoadingError);
+        }else {
+            mLoadingError = null;
         }
         if (!willContinueLoadData(data)) {
             hideProgressBar();
@@ -163,9 +192,9 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         hideProgressBar();
     }
 
-    protected void onLoaderError(LoadingError loadingError) {
-        mTextError.setText(loadingError.getErrorString());
-        mTextErrorDescription.setText(loadingError.getErrorDescription());
+    protected void onLoaderError(ExceptionWrapper loadingError) {
+        mTextError.setText(loadingError.getLocalizedMessage());
+        mTextErrorDescription.setText(loadingError.getCauseDescription());
     }
 
     protected void onButtonConfirmedClick() {
@@ -195,22 +224,8 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         mLayoutError.setVisibility(mLoadingError == null ? View.GONE : View.VISIBLE);
     }
 
-    protected class LoadingError {
-        private String errorDescription;
-
-        LoadingError(Exception exception) {
-            errorDescription = exception.getLocalizedMessage();
-        }
-
-        public String getErrorString() {
-            return getResources().getString(R.string.msg_loading_failed,
-                    Utils.getCategoryNameGenitive(getActivity(), mCategory),
-                    mObjectId);
-        }
-
-        public String getErrorDescription() {
-            return errorDescription;
-        }
-
+    public interface BaseObjectFragmentDelegate {
+        boolean onFragmentObjectLoadFinished(Fragment fragment, Object object);
+        boolean onFragmentObjectLoadingException(Fragment fragment, ExceptionWrapper exception);
     }
 }

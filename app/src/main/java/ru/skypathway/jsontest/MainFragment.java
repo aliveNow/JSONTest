@@ -14,7 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.skypathway.jsontest.data.adapters.MainCardsAdapter.CardItem;
+import ru.skypathway.jsontest.utils.CanHandleExceptionWrapper;
 import ru.skypathway.jsontest.utils.Constants;
+import ru.skypathway.jsontest.utils.ExceptionWrapper;
+import ru.skypathway.jsontest.utils.NetworkNotAvailableException;
 
 
 /**
@@ -27,10 +30,12 @@ import ru.skypathway.jsontest.utils.Constants;
  * Use the {@link MainFragment} factory method to
  * create an instance of this fragment.
  */
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment
+        implements CanHandleExceptionWrapper {
 
     private OnFragmentInteractionListener mListener;
     private RecyclerView mRecyclerView;
+    private View mCardError;
 
     public MainFragment() {}
 
@@ -49,6 +54,8 @@ public class MainFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        mCardError = view.findViewById(R.id.card_error);
+        hideAllErrors();
         return view;
     }
 
@@ -77,6 +84,25 @@ public class MainFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public boolean showError(ExceptionWrapper exception) {
+        if (exception.getCause() instanceof NetworkNotAvailableException) {
+            mCardError.setVisibility(View.VISIBLE);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void hideError(ExceptionWrapper exception) {
+        hideAllErrors();
+    }
+
+    @Override
+    public void hideAllErrors() {
+        mCardError.setVisibility(View.GONE);
     }
 
     public List<CardItem> getCardItems() {

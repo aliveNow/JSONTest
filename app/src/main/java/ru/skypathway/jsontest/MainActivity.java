@@ -17,12 +17,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import ru.skypathway.jsontest.utils.CanHandleExceptionWrapper;
+import ru.skypathway.jsontest.utils.ExceptionWrapper;
+
 /**
  * Created by samsmariya on 10.10.17.
  */
 
 public class MainActivity extends AppCompatActivity
-        implements MainFragment.OnFragmentInteractionListener {
+        implements MainFragment.OnFragmentInteractionListener,
+        BaseObjectFragment.BaseObjectFragmentDelegate{
+    public static final String TAG = MainActivity.class.getSimpleName();
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -66,7 +71,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -92,6 +96,32 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    @Override
+    public boolean onFragmentObjectLoadFinished(Fragment fragment, Object object) {
+        CanHandleExceptionWrapper exceptionHandler = findExceptionHandler(fragment);
+        if (exceptionHandler != null) {
+            exceptionHandler.hideAllErrors();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onFragmentObjectLoadingException(Fragment fragment, ExceptionWrapper exception) {
+        CanHandleExceptionWrapper exceptionHandler = findExceptionHandler(fragment);
+        if (exceptionHandler != null) {
+            return exceptionHandler.showError(exception);
+        }
+        return false;
+    }
+
+    private CanHandleExceptionWrapper findExceptionHandler(Fragment fragment) {
+        Fragment mainFragment = fragment.getParentFragment();
+        if (mainFragment instanceof CanHandleExceptionWrapper) {
+            return (CanHandleExceptionWrapper) mainFragment;
+        }
+        return null;
     }
 
     /**

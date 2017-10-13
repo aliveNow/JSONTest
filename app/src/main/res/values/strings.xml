@@ -19,4 +19,7 @@
     <string name="arg_photo_genitive">фотографии</string>
     <string name="arg_user_genitive">пользователя</string>
     <string name="arg_todo_genitive">to do</string>
+    <string name="error_network_not_available">Нет доступного интернет-соединения.</string>
+    <string name="msg_network_not_available">Нет доступного интернет-соединения.
+        Пожалуйста, проверьте интернет-соединение и попробуйте еще раз. </string>
 </resources>

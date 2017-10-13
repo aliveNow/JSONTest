@@ -2,6 +2,8 @@ package ru.skypathway.jsontest.data;
 
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -19,7 +21,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.skypathway.jsontest.R;
 import ru.skypathway.jsontest.utils.Constants;
+import ru.skypathway.jsontest.utils.NetworkNotAvailableException;
 
 /**
  * Created by samsmariya on 10.10.17.
@@ -140,6 +144,10 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
     }
 
     public String getUrlString(String urlSpec) throws IOException {
+        if (!isNetworkAvailable()) {
+            String msg = getContext().getResources().getString(R.string.error_network_not_available);
+            throw new NetworkNotAvailableException(msg);
+        }
         URL url = new URL(urlSpec);
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
         connection.setConnectTimeout(5000); //(Constants.CONNECTION_TIMEOUT);
@@ -160,6 +168,13 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
         } finally {
             connection.disconnect();
         }
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     public static class LoaderResult<T> {
