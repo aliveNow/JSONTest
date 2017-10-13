@@ -26,7 +26,8 @@ import ru.skypathway.jsontest.utils.ExceptionWrapper;
 
 public class MainActivity extends AppCompatActivity
         implements MainFragment.OnFragmentInteractionListener,
-        BaseObjectFragment.BaseObjectFragmentDelegate{
+        BaseObjectFragment.BaseObjectFragmentDelegate,
+        BaseObjectFragment.BaseObjectFragmentListener{
     public static final String TAG = MainActivity.class.getSimpleName();
 
     /**
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onFragmentObjectLoadFinished(Fragment fragment, Object object) {
+    public boolean onFragmentObjectLoadFinished(BaseObjectFragment fragment, Object object) {
         CanHandleExceptionWrapper exceptionHandler = findExceptionHandler(fragment);
         if (exceptionHandler != null) {
             exceptionHandler.hideAllErrors();
@@ -108,7 +109,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onFragmentObjectLoadingException(Fragment fragment, ExceptionWrapper exception) {
+    public boolean onFragmentObjectLoadingException(BaseObjectFragment fragment,
+                                                    ExceptionWrapper exception) {
         CanHandleExceptionWrapper exceptionHandler = findExceptionHandler(fragment);
         if (exceptionHandler != null) {
             return exceptionHandler.showError(exception);
@@ -122,6 +124,14 @@ public class MainActivity extends AppCompatActivity
             return (CanHandleExceptionWrapper) mainFragment;
         }
         return null;
+    }
+
+    @Override
+    public void onFragmentGetFocus(BaseObjectFragment fragment, View view) {
+        Fragment mainFragment = fragment.getParentFragment();
+        if (mainFragment instanceof MainFragment) {
+            ((MainFragment)mainFragment).scrollToView(fragment.getView());
+        }
     }
 
     /**

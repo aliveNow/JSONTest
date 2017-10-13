@@ -30,10 +30,13 @@ import ru.skypathway.jsontest.utils.Utils;
  * Created by samsmariya on 11.10.17.
  */
 public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
-        implements LoaderManager.LoaderCallbacks<LoaderResult<T>> {
+        implements LoaderManager.LoaderCallbacks<LoaderResult<T>>,
+        View.OnFocusChangeListener {
     private static final String TAG = BaseObjectFragment.class.getSimpleName();
 
     protected BaseObjectFragmentDelegate mDelegate;
+    protected BaseObjectFragmentListener mListener;
+
     protected T mObject;
     protected int mObjectId;
     protected final Constants.CategoryEnum mCategory = getCategory();
@@ -75,11 +78,17 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof MainFragment.OnFragmentInteractionListener) {
+        if (context instanceof BaseObjectFragmentDelegate) {
             mDelegate = (BaseObjectFragmentDelegate) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement BaseObjectFragmentDelegate");
+        }
+        if (context instanceof BaseObjectFragmentListener) {
+            mListener = (BaseObjectFragmentListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement BaseObjectFragmentListener");
         }
     }
 
@@ -87,6 +96,13 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     public void onDetach() {
         super.onDetach();
         mDelegate = null;
+        mListener = null;
+    }
+
+    public void onFocusChange(View v, boolean hasFocus) {
+        if (hasFocus) {
+            mListener.onFragmentGetFocus(this, v);
+        }
     }
 
     protected void onPrepareViews() {
@@ -120,6 +136,7 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
                     return false;
                 }
             });
+            mEditId.setOnFocusChangeListener(this);
         }
         mLayoutError = findViewById(R.id.layout_error);
         Utils.requireNonNull(mLayoutError, TAG +
@@ -198,9 +215,17 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     }
 
     protected void onButtonConfirmedClick() {
-        Utils.hideSoftInputKeyboard(getActivity());
-        mObjectId = Integer.parseInt(mEditId.getText().toString());
-        getLoaderManager().restartLoader(getLoaderId(), null, this);
+        int objId = 0;
+        try {
+            objId = Integer.parseInt(mEditId.getText().toString());
+        }catch (NumberFormatException nfe) {}
+        if (objId > 0) {
+            mObjectId = objId;
+            Utils.hideSoftInputKeyboard(getActivity());
+            mEditId.clearFocus();
+            getLoaderManager().restartLoader(getLoaderId(), null, this);
+            mListener.onFragmentGetFocus(this, mButtonConfirmed);
+        }
     }
 
     protected void onButtonTryAgainClick() {
@@ -225,7 +250,12 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     }
 
     public interface BaseObjectFragmentDelegate {
-        boolean onFragmentObjectLoadFinished(Fragment fragment, Object object);
-        boolean onFragmentObjectLoadingException(Fragment fragment, ExceptionWrapper exception);
+        boolean onFragmentObjectLoadFinished(BaseObjectFragment fragment, Object object);
+        boolean onFragmentObjectLoadingException(BaseObjectFragment fragment,
+                                                 ExceptionWrapper exception);
+    }
+
+    public interface BaseObjectFragmentListener {
+        void onFragmentGetFocus(BaseObjectFragment fragment, View view);
     }
 }

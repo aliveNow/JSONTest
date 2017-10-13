@@ -23,7 +23,6 @@
         <item name="android:foreground">?android:attr/selectableItemBackground</item>
         <item name="cardCornerRadius">@dimen/corner_radius_card</item>
         <item name="cardUseCompatPadding">true</item>
-        <item name="contentPadding">@dimen/padding_normal</item>
     </style>
 
     <style name="TextViewGridTitle" parent="TextAppearance.AppCompat.Medium">
@@ -41,6 +40,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textAppearance">?android:textAppearanceLarge</item>
+        <item name="android:paddingTop">@dimen/padding_normal</item>
         <item name="android:paddingBottom">@dimen/padding_half_normal</item>
     </style>
 
@@ -48,8 +48,12 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">vertical</item>
+        <item name="android:paddingLeft">@dimen/padding_normal</item>
+        <item name="android:paddingRight">@dimen/padding_normal</item>
         <item name="android:divider">?android:listDivider</item>
         <item name="android:showDividers">middle</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
     </style>
 
     <style name="LinearLayoutSectionContainer">

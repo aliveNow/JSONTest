@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +36,7 @@ public class MainFragment extends Fragment
 
     private OnFragmentInteractionListener mListener;
     private RecyclerView mRecyclerView;
+    private NestedScrollView mScrollView;
     private View mCardError;
 
     public MainFragment() {}
@@ -55,6 +57,7 @@ public class MainFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         mCardError = view.findViewById(R.id.card_error);
+        mScrollView = (NestedScrollView) view.findViewById(R.id.scroll_view);
         hideAllErrors();
         return view;
     }
@@ -103,6 +106,10 @@ public class MainFragment extends Fragment
     @Override
     public void hideAllErrors() {
         mCardError.setVisibility(View.GONE);
+    }
+
+    public void scrollToView(View view) {
+        mScrollView.smoothScrollTo(0, view.getTop());
     }
 
     public List<CardItem> getCardItems() {
