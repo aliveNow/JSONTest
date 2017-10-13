@@ -17,6 +17,7 @@ import ru.skypathway.jsontest.data.ArrayLoader;
 import ru.skypathway.jsontest.data.BaseLoader.LoaderResult;
 import ru.skypathway.jsontest.data.dao.User;
 import ru.skypathway.jsontest.utils.Constants;
+import ru.skypathway.jsontest.utils.DividerItemDecoration;
 
 
 /**
@@ -36,13 +37,14 @@ public class UsersFragment extends Fragment
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_users, container, false);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-        mRecyclerView.setNestedScrollingEnabled(false);
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        mRecyclerView.setNestedScrollingEnabled(false);
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity()));
         mUsersAdapter = new UsersAdapter(null);
         mRecyclerView.setAdapter(mUsersAdapter);
         getLoaderManager().initLoader(Constants.Loaders.USERS, null, this);
