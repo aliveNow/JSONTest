@@ -16,6 +16,11 @@
     <string name="button_confirm">Подтвердить</string>
     <string name="button_try_again">Попробовать еще раз</string>
     <string name="msg_loading_failed">Загрузка %1$s с %2$s = %3$s не удалась.</string>
+    <string name="error_unknown_host">Не удаётся подключиться к URL: %s.</string>
+    <string name="error_socket_timeout">Tаймаут запроса: %s.</string>
+    <string name="error_connect_exception">Сайт недоступен: %s.</string>
+    <string name="error_json_exception">Ошибка парсинга результата запроса: %s.</string>
+    <string name="error_other_exception">Не удалось получить результат: %s.</string>
     <string name="error_network_not_available">Вы не подключены к интернету.</string>
     <string name="msg_network_not_available">Вы не подключены к интернету.
         Пожалуйста, проверьте интернет-соединение и попробуйте еще раз. </string>

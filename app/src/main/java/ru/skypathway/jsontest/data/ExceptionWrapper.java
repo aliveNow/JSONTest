@@ -1,4 +1,4 @@
-package ru.skypathway.jsontest.utils;
+package ru.skypathway.jsontest.data;
 
 /**
  * Created by samsmariya on 13.10.17.

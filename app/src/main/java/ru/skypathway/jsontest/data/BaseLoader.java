@@ -16,14 +16,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 import ru.skypathway.jsontest.R;
 import ru.skypathway.jsontest.utils.Constants;
-import ru.skypathway.jsontest.utils.NetworkNotAvailableException;
 
 /**
  * Created by samsmariya on 10.10.17.
@@ -58,15 +60,17 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
 
     @Override
     public LoaderResult<D> loadInBackground() {
-        LoaderResult loaderResult = null;
+        LoaderResult loaderResult;
+        String url = null;
         try {
             if (mObjectIds == null) {
                 return null;
             }
-            SystemClock.sleep(3000);
+            // FIXME: 14.10.17 sleep поставлен, чтобы отследить работу progressbar
+            SystemClock.sleep(1000);
             List<String> resultStrings = new ArrayList<>();
             for (int objectId : mObjectIds) {
-                String url = Uri.parse(BASE_URL_STRING)
+                url = Uri.parse(BASE_URL_STRING)
                         .buildUpon()
                         .appendPath(mCategory.value)
                         .appendPath(Integer.toString(objectId))
@@ -80,13 +84,9 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
             setCache(resultObject);
             loaderResult = new LoaderResult<>(resultObject, null);
         }catch (Exception exception) {
-            Log.e(TAG, "Failed ", exception);
-            loaderResult = new LoaderResult<>(null, exception);
-        }/* catch (IOException ioe) {
-            Log.e(TAG, "Failed ", ioe);
-        }catch (JSONException je){
-            Log.e(TAG, "Failed to parse JSON", je);
-        } */
+            Log.e(TAG, "Failed to load: " + url, exception);
+            loaderResult = new LoaderResult<>(null, getDetailedException(exception, url));
+        }
         return loaderResult;
     }
 
@@ -150,21 +150,30 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
         }
         URL url = new URL(urlSpec);
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-        connection.setConnectTimeout(5000); //(Constants.CONNECTION_TIMEOUT);
-        // TODO: 10.10.17 java 7 и try с ресурсами
+        connection.setConnectTimeout(Constants.CONNECTION_TIMEOUT);
+        // TODO: 10.10.17 java 7 и try с ресурсами. Update 14.10.17 - увы, только с 19 API работает.
         try {
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                // TODO: можно было бы по кодам ошибок написать сообщения на русском. Наверное.
                 throw new IOException(connection.getResponseMessage() + ": with " + urlSpec);
             }
-            InputStream is = connection.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
+            InputStream is = null;
+            String result = null;
+            try {
+                is = connection.getInputStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                }
+                result = sb.toString();
+            }finally {
+                if (is != null) {
+                    is.close();
+                }
             }
-            is.close();
-            return sb.toString();
+            return result;
         } finally {
             connection.disconnect();
         }
@@ -175,6 +184,30 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
                 = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    protected Exception getDetailedException(Exception exception, String url) {
+        int errorMsgId;
+        if (exception instanceof NetworkNotAvailableException) {
+            errorMsgId = 0;
+        }else if (exception instanceof SocketTimeoutException) {
+            errorMsgId = R.string.error_socket_timeout;
+        }else if (exception instanceof UnknownHostException) {
+            errorMsgId = R.string.error_unknown_host;
+        }else if (exception instanceof ConnectException) {
+            errorMsgId = R.string.error_connect_exception;
+        }else if (exception instanceof JSONException) {
+            errorMsgId = R.string.error_json_exception;
+        }else if (exception instanceof IOException) {
+            errorMsgId = 0;
+        }else {
+            errorMsgId = R.string.error_other_exception;
+        }
+        if (errorMsgId != 0) {
+            String msg = getContext().getResources().getString(errorMsgId, url);
+            return new ExceptionWrapper(exception, msg);
+        }
+        return exception;
     }
 
     public static class LoaderResult<T> {

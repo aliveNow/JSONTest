@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 import ru.skypathway.jsontest.data.BaseLoader.LoaderResult;
 import ru.skypathway.jsontest.utils.Constants;
-import ru.skypathway.jsontest.utils.ExceptionWrapper;
+import ru.skypathway.jsontest.data.ExceptionWrapper;
 import ru.skypathway.jsontest.utils.InputFilterMinMax;
 import ru.skypathway.jsontest.utils.TextChangedListener;
 import ru.skypathway.jsontest.utils.Utils;

@@ -1,4 +1,4 @@
-package ru.skypathway.jsontest.utils;
+package ru.skypathway.jsontest.data;
 
 import java.io.IOException;
 

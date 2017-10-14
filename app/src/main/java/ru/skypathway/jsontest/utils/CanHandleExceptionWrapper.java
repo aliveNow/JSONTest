@@ -1,5 +1,7 @@
 package ru.skypathway.jsontest.utils;
 
+import ru.skypathway.jsontest.data.ExceptionWrapper;
+
 /**
  * Created by samsmariya on 13.10.17.
  */

@@ -11,7 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import ru.skypathway.jsontest.utils.CanHandleExceptionWrapper;
-import ru.skypathway.jsontest.utils.ExceptionWrapper;
+import ru.skypathway.jsontest.data.ExceptionWrapper;
 
 /**
  * Created by samsmariya on 10.10.17.

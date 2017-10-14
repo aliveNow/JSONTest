@@ -1,7 +1,6 @@
 package ru.skypathway.jsontest.data.dao;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,10 +15,9 @@ import ru.skypathway.jsontest.utils.Constants;
  */
 
 public class JSONConverter {
-    public static final String TAG = JSONConverter.class.getSimpleName();
-    private static final String MESSAGE_JSON_EXCEPTION = "Failed to parse JSON";
 
-    public static<T extends BaseObject> T getBaseObject(JSONObject jsonObject, Constants.CategoryEnum category) {
+    public static<T extends BaseObject> T getBaseObject(JSONObject jsonObject,
+                                                        Constants.CategoryEnum category) throws JSONException{
         if (jsonObject == null) {
             return null;
         }
@@ -34,7 +32,8 @@ public class JSONConverter {
         return null;
     }
 
-    public static<T extends BaseObject> List<T> getObjectsList(List<JSONObject> jsonObjects, Constants.CategoryEnum category) {
+    public static<T extends BaseObject> List<T> getObjectsList(List<JSONObject> jsonObjects,
+                                                               Constants.CategoryEnum category) throws JSONException {
         List<T> listResult = new ArrayList<>();
         for (JSONObject jsonObject : jsonObjects) {
             T object = getBaseObject(jsonObject, category);
@@ -45,58 +44,38 @@ public class JSONConverter {
         return listResult;
     }
 
-    static Post getPost(@NonNull JSONObject jsonObject) {
-        try {
-            Post newObject = new Post();
-            newObject.id = jsonObject.getInt("id");
-            newObject.title = jsonObject.getString("title");
-            newObject.body = jsonObject.getString("body");
-            return newObject;
-        } catch (JSONException je) {
-            Log.e(TAG, MESSAGE_JSON_EXCEPTION, je);
-        }
-        return null;
+    static Post getPost(@NonNull JSONObject jsonObject) throws JSONException {
+        Post newObject = new Post();
+        newObject.id = jsonObject.getInt("id");
+        newObject.title = jsonObject.getString("title");
+        newObject.body = jsonObject.getString("body");
+        return newObject;
     }
 
-    static Comment getComment(@NonNull JSONObject jsonObject) {
-        try {
-            Comment newObject = new Comment();
-            newObject.id = jsonObject.getInt("id");
-            newObject.name = jsonObject.getString("name");
-            newObject.email = jsonObject.getString("email");
-            newObject.body = jsonObject.getString("body");
-            return newObject;
-        } catch (JSONException je) {
-            Log.e(TAG, MESSAGE_JSON_EXCEPTION, je);
-        }
-        return null;
+    static Comment getComment(@NonNull JSONObject jsonObject) throws JSONException {
+        Comment newObject = new Comment();
+        newObject.id = jsonObject.getInt("id");
+        newObject.name = jsonObject.getString("name");
+        newObject.email = jsonObject.getString("email");
+        newObject.body = jsonObject.getString("body");
+        return newObject;
     }
 
-    static Photo getPhoto(@NonNull JSONObject jsonObject) {
-        try {
-            Photo newObject = new Photo();
-            newObject.id = jsonObject.getInt("id");
-            newObject.title = jsonObject.getString("title");
-            newObject.url = jsonObject.getString("url");
-            newObject.thumbnailUrl = jsonObject.getString("thumbnailUrl");
-            return newObject;
-        } catch (JSONException je) {
-            Log.e(TAG, MESSAGE_JSON_EXCEPTION, je);
-        }
-        return null;
+    static Photo getPhoto(@NonNull JSONObject jsonObject) throws JSONException {
+        Photo newObject = new Photo();
+        newObject.id = jsonObject.getInt("id");
+        newObject.title = jsonObject.getString("title");
+        newObject.url = jsonObject.getString("url");
+        newObject.thumbnailUrl = jsonObject.getString("thumbnailUrl");
+        return newObject;
     }
 
-    static User getUser(@NonNull JSONObject jsonObject) {
-        try {
-            User newObject = new User();
-            newObject.id = jsonObject.getInt("id");
-            newObject.name = jsonObject.getString("name");
-            newObject.username = jsonObject.getString("username");
-            return newObject;
-        } catch (JSONException je) {
-            Log.e(TAG, MESSAGE_JSON_EXCEPTION, je);
-        }
-        return null;
+    static User getUser(@NonNull JSONObject jsonObject) throws JSONException {
+        User newObject = new User();
+        newObject.id = jsonObject.getInt("id");
+        newObject.name = jsonObject.getString("name");
+        newObject.username = jsonObject.getString("username");
+        return newObject;
     }
     
 }
