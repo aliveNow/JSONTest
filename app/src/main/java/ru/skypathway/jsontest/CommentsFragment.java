@@ -3,14 +3,11 @@ package ru.skypathway.jsontest;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import ru.skypathway.jsontest.data.BaseLoader;
-import ru.skypathway.jsontest.data.ObjectLoader;
 import ru.skypathway.jsontest.data.dao.Comment;
 import ru.skypathway.jsontest.utils.Constants;
 
@@ -47,17 +44,17 @@ public class CommentsFragment extends BaseObjectFragment<Comment> {
     }
 
     @Override
+    protected boolean isOneObjectFragment() {
+        return true;
+    }
+
+    @Override
     protected void onDataObjectChange(Comment data) {
         if (data != null) {
             mTextName.setText(data.getName());
             mTextEmail.setText(data.getEmail());
             mTextComment.setText(data.getBody());
         }
-    }
-
-    @Override
-    protected Loader<BaseLoader.LoaderResult<Comment>> getNewLoader(Bundle args) {
-        return new ObjectLoader<>(getActivity(), mCategory, getFirstObjectId());
     }
 
 }

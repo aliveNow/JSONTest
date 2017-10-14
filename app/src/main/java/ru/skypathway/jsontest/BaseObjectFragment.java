@@ -19,9 +19,13 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.util.List;
+
 import ru.skypathway.jsontest.data.BaseLoader.LoaderResult;
-import ru.skypathway.jsontest.utils.Constants;
+import ru.skypathway.jsontest.data.BaseObjectLoader;
 import ru.skypathway.jsontest.data.ExceptionWrapper;
+import ru.skypathway.jsontest.data.dao.BaseObject;
+import ru.skypathway.jsontest.utils.Constants;
 import ru.skypathway.jsontest.utils.InputFilterMinMax;
 import ru.skypathway.jsontest.utils.TextChangedListener;
 import ru.skypathway.jsontest.utils.Utils;
@@ -29,7 +33,7 @@ import ru.skypathway.jsontest.utils.Utils;
 /**
  * Created by samsmariya on 11.10.17.
  */
-public abstract class BaseObjectFragment<T> extends Fragment
+public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         implements LoaderManager.LoaderCallbacks<LoaderResult<T>>,
         View.OnFocusChangeListener,
         TextView.OnEditorActionListener {
@@ -38,7 +42,7 @@ public abstract class BaseObjectFragment<T> extends Fragment
     protected BaseObjectFragmentDelegate mDelegate;
     protected BaseObjectFragmentListener mListener;
 
-    protected T mObject;
+    protected List<T> mObjects;
     protected int[] mObjectIds;
     protected final Constants.CategoryEnum mCategory = getCategory();
 
@@ -175,7 +179,9 @@ public abstract class BaseObjectFragment<T> extends Fragment
     }
 
     public abstract @NonNull Constants.CategoryEnum getCategory();
-    protected abstract void onDataObjectChange(T data);
+    protected abstract boolean isOneObjectFragment();
+    protected void onDataChange(List<T> data) {}
+    protected void onDataObjectChange(T data) {}
 
     protected boolean willContinueLoadData(LoaderResult<T> data){
         return false;
@@ -184,7 +190,10 @@ public abstract class BaseObjectFragment<T> extends Fragment
     public int getLoaderId() {
         return mCategory.ordinal();
     }
-    protected abstract Loader<LoaderResult<T>> getNewLoader(Bundle args);
+
+    protected Loader<LoaderResult<T>> getNewLoader(Bundle args) {
+        return new BaseObjectLoader<>(getActivity(), mCategory, mObjectIds);
+    }
 
     @Override
     public Loader<LoaderResult<T>> onCreateLoader(int id, Bundle args) {
@@ -197,9 +206,16 @@ public abstract class BaseObjectFragment<T> extends Fragment
 
     @Override
     public void onLoadFinished(Loader<LoaderResult<T>> loader, LoaderResult<T> data) {
-        mObject = data.getResult();
-        if (!mDelegate.onFragmentObjectLoadFinished(this, mObject)) {
-            onDataObjectChange(mObject);
+        mObjects = data.getResult();
+        if (!mDelegate.onFragmentObjectLoadFinished(this, mObjects)) {
+            if (mObjects == null || mObjects.size() == 0) {
+                mObjects = null;
+            }
+            if (isOneObjectFragment()) {
+                onDataObjectChange(mObjects != null ? mObjects.get(0) : null);
+            }else {
+                onDataChange(mObjects);
+            }
         }
         if (data.getError() != null) {
             String errorStr;
@@ -221,8 +237,12 @@ public abstract class BaseObjectFragment<T> extends Fragment
 
     @Override
     public void onLoaderReset(Loader<LoaderResult<T>> loader) {
-        mObject = null;
-        onDataObjectChange(null);
+        mObjects = null;
+        if (isOneObjectFragment()) {
+            onDataObjectChange(null);
+        }else {
+            onDataChange(null);
+        }
         hideProgressBar();
     }
 
@@ -262,7 +282,7 @@ public abstract class BaseObjectFragment<T> extends Fragment
         if (mProgressBar != null) {
             mProgressBar.setVisibility(View.GONE);
         }
-        mLayoutResults.setVisibility(mObject == null ? View.GONE : View.VISIBLE);
+        mLayoutResults.setVisibility(mObjects == null ? View.GONE : View.VISIBLE);
         mLayoutError.setVisibility(mLoadingError == null ? View.GONE : View.VISIBLE);
     }
 

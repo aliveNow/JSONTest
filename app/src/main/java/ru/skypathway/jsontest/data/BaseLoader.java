@@ -10,6 +10,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 import org.json.JSONException;
 
 import java.io.BufferedReader;
@@ -23,9 +26,11 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import ru.skypathway.jsontest.R;
 import ru.skypathway.jsontest.utils.Constants;
+import ru.skypathway.jsontest.utils.Utils;
 
 /**
  * Created by samsmariya on 10.10.17.
@@ -36,31 +41,23 @@ import ru.skypathway.jsontest.utils.Constants;
 
 public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderResult<D>> {
     private static final String TAG = BaseLoader.class.getSimpleName();
-    public static final String BASE_URL_STRING = "https://jsonplaceholder.typicode.com/";
 
-    protected Constants.CategoryEnum mCategory; // FIXME: 10.10.17 заменить на строку или вытащить в пакет data?
     protected int[] mObjectIds;
-    protected D mCache;
+    protected Cache<Integer, D> mCache;
+    private int mCacheSize = 50;
+    private int mCacheExpireTime = 10;
 
     public BaseLoader(Context context,
-                      Constants.CategoryEnum category,
-                      int objectId) {
-        super(context);
-        mCategory = category;
-        mObjectIds = new int[]{objectId};
-    }
-
-    public BaseLoader(Context context,
-                      Constants.CategoryEnum category,
                       int[] objectIds) {
         super(context);
-        mCategory = category;
+        Utils.requireNonNull(objectIds, TAG + ": ObjectIds can't be null");
         mObjectIds = objectIds;
+        createCache();
     }
 
     @Override
     public LoaderResult<D> loadInBackground() {
-        LoaderResult loaderResult;
+        LoaderResult<D> loaderResult;
         String url = null;
         try {
             if (mObjectIds == null) {
@@ -68,41 +65,44 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
             }
             // FIXME: 14.10.17 sleep поставлен, чтобы отследить работу progressbar
             SystemClock.sleep(1000);
-            List<String> resultStrings = new ArrayList<>();
+            List<D> resultList = new ArrayList<>();
             for (int objectId : mObjectIds) {
-                url = Uri.parse(BASE_URL_STRING)
-                        .buildUpon()
-                        .appendPath(mCategory.value)
-                        .appendPath(Integer.toString(objectId))
-                        .build().toString();
-                String string = getUrlString(url);
-                if (string != null) {
-                    resultStrings.add(string);
+                // TODO: 14.10.17  реализовать проверку, была ли отменена загрузка
+                D resultObject = mCache.getIfPresent(objectId);
+                if (resultObject == null) {
+                    url = getLoadingUri(objectId).toString();
+                    String string = getUrlString(url);
+                    if (string != null) {
+                        resultObject = convertToResult(string);
+                        mCache.put(objectId, resultObject);
+                    }else {
+                        throw new IOException("Result is NULL at url: " + url);
+                    }
                 }
+                resultList.add(resultObject);
             }
-            D resultObject = convertToResult(resultStrings);
-            setCache(resultObject);
-            loaderResult = new LoaderResult<>(resultObject, null);
+            loaderResult = new LoaderResult<>(resultList, null);
         }catch (Exception exception) {
             Log.e(TAG, "Failed to load: " + url, exception);
-            loaderResult = new LoaderResult<>(null, getDetailedException(exception, url));
+            loaderResult = new LoaderResult<>(getDetailedException(exception, url));
         }
         return loaderResult;
     }
 
-    protected abstract D convertToResult(@NonNull List<String> strings) throws JSONException;
+    protected abstract @NonNull D convertToResult(@NonNull String string) throws Exception;
+    protected abstract @NonNull Uri getLoadingUri(int objectId) throws Exception;
 
     /**
      * Handles a request to start the Loader.
      */
     @Override protected void onStartLoading() {
-        if (mCache != null) {
-            // If we currently have a result available, deliver it
-            // immediately.
-            deliverResult(new LoaderResult<>(mCache, null));
+        List<D> results = getCacheResult(mObjectIds);
+
+        if (results != null) {
+            deliverResult(new LoaderResult<>(results, null));
         }
 
-        if (takeContentChanged() || mCache == null) {
+        if (takeContentChanged() || results == null) {
             // If the data has changed since the last time it was loaded
             // or is not currently available, start a load.
             forceLoad();
@@ -118,14 +118,6 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
     }
 
     /**
-     * Handles a request to cancel a load.
-     */
-    @Override public void onCanceled(LoaderResult<D> data) {
-        super.onCanceled(data);
-        releaseCache();
-    }
-
-    /**
      * Handles a request to completely reset the Loader.
      */
     @Override protected void onReset() {
@@ -135,15 +127,39 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
         releaseCache();
     }
 
-    protected void setCache(D mCache) {
-        this.mCache = mCache;
+    public synchronized Cache<Integer, D> createCache() {
+        mCache = CacheBuilder.newBuilder()
+                .maximumSize(mCacheSize)
+                .expireAfterWrite(mCacheExpireTime, TimeUnit.MINUTES)
+                .build();
+        return mCache;
     }
 
-    protected void releaseCache(){
+    protected List<D> getCacheResult(int[] ids) {
+        if (ids == null) {
+            return null;
+        }
+        List<D> results = new ArrayList<>();
+        for (int id : ids) {
+            D obj = mCache.getIfPresent(id);
+            if (obj != null) {
+                results.add(obj);
+            }else {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    protected synchronized void releaseCache() {
+        if (mCache != null) {
+            mCache.invalidateAll();
+            mCache.cleanUp();
+        }
         mCache = null;
     }
 
-    public String getUrlString(String urlSpec) throws IOException {
+    protected String getUrlString(String urlSpec) throws IOException {
         if (!isNetworkAvailable()) {
             String msg = getContext().getResources().getString(R.string.error_network_not_available);
             throw new NetworkNotAvailableException(msg);
@@ -188,7 +204,8 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
 
     protected Exception getDetailedException(Exception exception, String url) {
         int errorMsgId;
-        if (exception instanceof NetworkNotAvailableException) {
+        if (exception instanceof NetworkNotAvailableException
+                || exception instanceof ExceptionWrapper) {
             errorMsgId = 0;
         }else if (exception instanceof SocketTimeoutException) {
             errorMsgId = R.string.error_socket_timeout;
@@ -211,20 +228,35 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
     }
 
     public static class LoaderResult<T> {
-        private final T result;
-        private final Exception error;
+        private final List<T> mResult;
+        private final Exception mError;
 
-        public LoaderResult(T result, Exception error) {
-            this.result = result;
-            this.error = error;
+        public LoaderResult(List<T> result, Exception error) {
+            mResult = result;
+            mError = error;
         }
 
-        public T getResult() {
-            return result;
+        public LoaderResult(T resultObject, Exception error) {
+            List result = null;
+            if (resultObject != null) {
+                result = new ArrayList<>();
+                result.add(resultObject);
+            }
+            mResult = result;
+            mError = error;
+        }
+
+        public LoaderResult(Exception error) {
+            mResult = null;
+            mError = error;
+        }
+
+        public List<T> getResult() {
+            return mResult;
         }
 
         public Exception getError() {
-            return error;
+            return mError;
         }
     }
 }

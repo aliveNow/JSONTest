@@ -2,7 +2,6 @@ package ru.skypathway.jsontest;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +10,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import ru.skypathway.jsontest.data.ArrayLoader;
-import ru.skypathway.jsontest.data.BaseLoader.LoaderResult;
 import ru.skypathway.jsontest.data.dao.User;
 import ru.skypathway.jsontest.utils.Constants;
 import ru.skypathway.jsontest.utils.DividerItemDecoration;
@@ -21,7 +18,7 @@ import ru.skypathway.jsontest.utils.DividerItemDecoration;
 /**
  * Created by samsmariya on 10.10.17.
  */
-public class UsersFragment extends BaseObjectFragment<List<User>> {
+public class UsersFragment extends BaseObjectFragment<User> {
     protected RecyclerView mRecyclerView;
     protected UsersAdapter mUsersAdapter;
 
@@ -53,15 +50,13 @@ public class UsersFragment extends BaseObjectFragment<List<User>> {
     }
 
     @Override
-    protected void onDataObjectChange(List<User> data) {
-        mUsersAdapter.setUsers(data);
+    protected boolean isOneObjectFragment() {
+        return false;
     }
 
     @Override
-    protected Loader<LoaderResult<List<User>>> getNewLoader(Bundle args) {
-        return new ArrayLoader<>(getActivity(),
-                Constants.CategoryEnum.USERS,
-                mObjectIds);
+    protected void onDataChange(List<User> data) {
+        mUsersAdapter.setUsers(data);
     }
 
     private static class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
