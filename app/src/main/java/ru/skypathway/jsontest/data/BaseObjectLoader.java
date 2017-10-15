@@ -22,22 +22,22 @@ public class BaseObjectLoader<D extends BaseObject> extends BaseLoader<D> {
 
     protected Constants.CategoryEnum mCategory; // FIXME: 10.10.17 заменить на строку или вытащить в пакет data?
 
-    public BaseObjectLoader(Context context,
-                            Constants.CategoryEnum category,
-                            int[] objectIds) {
+    public BaseObjectLoader(@NonNull Context context,
+                            @NonNull Constants.CategoryEnum category,
+                            @NonNull int[] objectIds) {
         super(context, objectIds);
         Utils.requireNonNull(category, TAG + ": Category can't be null");
         mCategory = category;
     }
 
-    public BaseObjectLoader(Context context,
-                            Constants.CategoryEnum category,
+    public BaseObjectLoader(@NonNull Context context,
+                            @NonNull Constants.CategoryEnum category,
                             int objectId) {
         this(context, category, new int[]{objectId});
     }
 
     @Override
-    protected @NonNull D convertToResult(@NonNull String jsonString) throws JSONException {
+    protected @NonNull D convertToResult(int objectId, @NonNull String jsonString) throws JSONException {
         JSONObject jsonBody = new JSONObject(jsonString);
         D result = JSONConverter.getBaseObject(jsonBody, mCategory);
         return result;

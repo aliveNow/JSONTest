@@ -35,6 +35,13 @@ import ru.skypathway.jsontest.utils.Utils;
 /**
  * Created by samsmariya on 10.10.17.
  *
+ * Базовый загрузчик объектов.
+ * Загружает все объекты с id = {@link #mObjectIds}. Возвращает результат {@link LoaderResult},
+ * который при успешной загрузке в {@link LoaderResult#getResult()} содержит {@link List} объектов,
+ * расположенных в том же порядке, что и их id в {@link #mObjectIds}.
+ * Если хотя бы один объект загрузить не удалось, {@link LoaderResult#getResult()} будет возвращать
+ * {@code null}, а {@link LoaderResult#getError()} будет содержать ошибку загрузки.
+ *
  * Пример реализации частично подсмотрен отсюда:
  * https://developer.android.com/reference/android/content/AsyncTaskLoader.html
  */
@@ -43,26 +50,26 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
     private static final String TAG = BaseLoader.class.getSimpleName();
 
     protected int[] mObjectIds;
+
     protected Cache<Integer, D> mCache;
     private int mCacheSize = 50;
     private int mCacheExpireTime = 10;
 
-    public BaseLoader(Context context,
-                      int[] objectIds) {
+    public BaseLoader(@NonNull Context context,
+                      @NonNull int[] objectIds) {
         super(context);
         Utils.requireNonNull(objectIds, TAG + ": ObjectIds can't be null");
         mObjectIds = objectIds;
         createCache();
     }
 
+    //region Overridden Loader Methods
+    //--------------------------------------------------------------------------------
     @Override
     public LoaderResult<D> loadInBackground() {
         LoaderResult<D> loaderResult;
         String url = null;
         try {
-            if (mObjectIds == null) {
-                return null;
-            }
             // FIXME: 14.10.17 sleep поставлен, чтобы отследить работу progressbar
             SystemClock.sleep(1000);
             List<D> resultList = new ArrayList<>();
@@ -73,7 +80,7 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
                     url = getLoadingUri(objectId).toString();
                     String string = getUrlString(url);
                     if (string != null) {
-                        resultObject = convertToResult(string);
+                        resultObject = convertToResult(objectId, string);
                         mCache.put(objectId, resultObject);
                     }else {
                         throw new IOException("Result is NULL at url: " + url);
@@ -88,9 +95,6 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
         }
         return loaderResult;
     }
-
-    protected abstract @NonNull D convertToResult(@NonNull String string) throws Exception;
-    protected abstract @NonNull Uri getLoadingUri(int objectId) throws Exception;
 
     /**
      * Handles a request to start the Loader.
@@ -126,7 +130,40 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
         onStopLoading();
         releaseCache();
     }
+    //--------------------------------------------------------------------------------
+    //endregion
 
+    //region Abstract Methods
+    //--------------------------------------------------------------------------------
+    /**
+     * Возвращает URI для загрузки объекта с id = {@code objectId}.
+     *
+     * @param objectId идентификатор загружаемого объекта
+     * @return Uri для загрузки объекта с id = {@code objectId}
+     * @throws Exception любое исключение при невозможности определить URI загрузки.
+     * Например: "такого id не существует", если это можно проверить заранее.
+     */
+    protected abstract @NonNull Uri getLoadingUri(int objectId) throws Exception;
+
+    /**
+     * Метод парсинга строки, загруженной по {@link #getLoadingUri(int)}, в объект.
+     *
+     * @param objectId идентификатор загруженного объекта
+     * @param string строка для парсинга
+     * @return объект, соответствующий параметризованному типу
+     * @throws Exception любое исключение, возникшее при парсинге
+     */
+    protected abstract @NonNull D convertToResult(int objectId,
+                                                  @NonNull String string) throws Exception;
+    //--------------------------------------------------------------------------------
+    //endregion
+
+    //region Cache
+    //--------------------------------------------------------------------------------
+    /* TODO: 15.10.17 кэш тут на самом деле пока бесполезен, потому что каждый раз, когда
+    меняется id, вызывается restartLoader и создаётся новый загрузчик.
+    Подумать, что можно сделать.
+     */
     public synchronized Cache<Integer, D> createCache() {
         mCache = CacheBuilder.newBuilder()
                 .maximumSize(mCacheSize)
@@ -158,7 +195,11 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
         }
         mCache = null;
     }
+    //--------------------------------------------------------------------------------
+    //endregion
 
+    //region Loading
+    //--------------------------------------------------------------------------------
     protected String getUrlString(String urlSpec) throws IOException {
         if (!isNetworkAvailable()) {
             String msg = getContext().getResources().getString(R.string.error_network_not_available);
@@ -194,7 +235,11 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
             connection.disconnect();
         }
     }
+    //--------------------------------------------------------------------------------
+    //endregion
 
+    //region Helper Methods
+    //--------------------------------------------------------------------------------
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -226,22 +271,14 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
         }
         return exception;
     }
+    //--------------------------------------------------------------------------------
+    //endregion
 
     public static class LoaderResult<T> {
         private final List<T> mResult;
         private final Exception mError;
 
         public LoaderResult(List<T> result, Exception error) {
-            mResult = result;
-            mError = error;
-        }
-
-        public LoaderResult(T resultObject, Exception error) {
-            List result = null;
-            if (resultObject != null) {
-                result = new ArrayList<>();
-                result.add(resultObject);
-            }
             mResult = result;
             mError = error;
         }
