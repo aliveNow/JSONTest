@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity
                                                     ExceptionWrapper exception) {
         CanHandleExceptionWrapper exceptionHandler = findExceptionHandler(fragment);
         if (exceptionHandler != null) {
-            return exceptionHandler.showError(exception);
+            exceptionHandler.showError(exception);
         }
         return false;
     }

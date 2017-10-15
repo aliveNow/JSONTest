@@ -48,6 +48,8 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     protected final Constants.CategoryEnum mCategory = getCategory();
 
     protected ExceptionWrapper mLoadingError;
+    protected boolean shouldShowError;
+    protected boolean shouldShowResult;
 
     protected View mLayoutResults;
     protected View mLayoutEnterId;
@@ -210,10 +212,13 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     @Override
     public void onLoadFinished(Loader<LoaderResult<T>> loader, LoaderResult<T> data) {
         mObjects = data.getResult();
-        if (!mDelegate.onFragmentObjectLoadFinished(this, mObjects)) {
-            if (mObjects == null || mObjects.size() == 0) {
-                mObjects = null;
-            }
+        if (mObjects == null || mObjects.size() == 0) {
+            mObjects = null;
+            shouldShowResult = false;
+        }else {
+            shouldShowResult = !mDelegate.onFragmentObjectLoadFinished(this, mObjects);
+        }
+        if (shouldShowResult) {
             if (isOneObjectFragment()) {
                 onDataObjectChange(mObjects != null ? mObjects.get(0) : null);
             }else {
@@ -228,10 +233,13 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
                     getResources().getQuantityString(R.plurals.plurals_ids, mObjectIds.length),
                     Utils.arrayToString(",", mObjectIds));
             mLoadingError = new ExceptionWrapper(data.getError(), errorStr);
-            mDelegate.onFragmentObjectLoadingException(this, mLoadingError);
-            onLoaderError(mLoadingError);
+            shouldShowError = !mDelegate.onFragmentObjectLoadingException(this, mLoadingError);
+            if (shouldShowError) {
+                onLoaderError(mLoadingError);
+            }
         }else {
             mLoadingError = null;
+            shouldShowError = false;
         }
         if (!willContinueLoadData(data)) {
             hideProgressBar();
@@ -285,8 +293,8 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         if (mProgressBar != null) {
             mProgressBar.setVisibility(View.GONE);
         }
-        mLayoutResults.setVisibility(mObjects == null ? View.GONE : View.VISIBLE);
-        mLayoutError.setVisibility(mLoadingError == null ? View.GONE : View.VISIBLE);
+        mLayoutResults.setVisibility(shouldShowResult ? View.VISIBLE : View.GONE);
+        mLayoutError.setVisibility(shouldShowError ? View.VISIBLE : View.GONE);
     }
 
     public interface BaseObjectFragmentDelegate {
