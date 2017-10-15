@@ -80,6 +80,8 @@ public class PhotosFragment extends BaseObjectFragment<Photo>
         return false;
     }
 
+    //region picasso.Callback Implementation
+    //--------------------------------------------------------------------------------
     @Override
     public void onSuccess() {
         mImageView.setVisibility(View.VISIBLE);
@@ -91,5 +93,7 @@ public class PhotosFragment extends BaseObjectFragment<Photo>
         mImageView.setVisibility(View.GONE);
         hideProgressBar();
     }
+    //--------------------------------------------------------------------------------
+    //endregion
 }
 

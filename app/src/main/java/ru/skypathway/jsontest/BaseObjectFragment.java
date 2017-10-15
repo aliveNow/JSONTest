@@ -325,9 +325,11 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
 
     protected void restartLoading() {
         Utils.hideSoftInputKeyboard(getActivity());
-        mEditId.clearFocus();
+        if (mEditId != null) {
+            mEditId.clearFocus();
+        }
         getLoaderManager().restartLoader(getLoaderId(), null, this);
-        mListener.onFragmentGetFocus(this, mButtonConfirmed);
+        mListener.onBaseFragmentGetFocus(this, mButtonConfirmed);
     }
 
     protected void showProgressBar() {
@@ -352,7 +354,7 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         if (hasFocus) {
-            mListener.onFragmentGetFocus(this, v);
+            mListener.onBaseFragmentGetFocus(this, v);
         }
     }
 
@@ -427,7 +429,7 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
          * @param fragment - экземпляр текущего фрагмента
          * @param view - которое получило фокус
          */
-        void onFragmentGetFocus(BaseObjectFragment fragment, View view);
+        void onBaseFragmentGetFocus(BaseObjectFragment fragment, View view);
     }
     //--------------------------------------------------------------------------------
     //endregion

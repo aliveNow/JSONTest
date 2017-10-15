@@ -14,14 +14,8 @@ import ru.skypathway.jsontest.data.NetworkNotAvailableException;
 
 /**
  * Created by samsmariya on 10.10.17.
- *
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link MainFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link MainFragment} factory method to
- * create an instance of this fragment.
  */
+
 public class MainFragment extends Fragment
         implements CanHandleExceptionWrapper {
 
@@ -50,6 +44,8 @@ public class MainFragment extends Fragment
         return view;
     }
 
+    //region CanHandleExceptionWrapper Implementation
+    //--------------------------------------------------------------------------------
     @Override
     public boolean showError(ExceptionWrapper exception) {
         if (exception.getCause() instanceof NetworkNotAvailableException) {
@@ -68,6 +64,8 @@ public class MainFragment extends Fragment
     public void hideAllErrors() {
         mCardError.setVisibility(View.GONE);
     }
+    //--------------------------------------------------------------------------------
+    //endregion
 
     public void scrollToView(View view) {
         mScrollView.smoothScrollTo(0, view.getTop());

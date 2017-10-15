@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity
         mViewPager.setAdapter(mSectionsPagerAdapter);
     }
 
+    //region BaseObjectFragmentDelegate Implementation
+    //--------------------------------------------------------------------------------
     @Override
     public boolean onBaseFragmentLoadFinished(BaseObjectFragment fragment, List<BaseObject> list) {
         CanHandleExceptionWrapper exceptionHandler = findExceptionHandler(fragment);
@@ -64,6 +66,8 @@ public class MainActivity extends AppCompatActivity
         }
         return false;
     }
+    //--------------------------------------------------------------------------------
+    //endregion
 
     private CanHandleExceptionWrapper findExceptionHandler(Fragment fragment) {
         Fragment mainFragment = fragment.getParentFragment();
@@ -73,13 +77,17 @@ public class MainActivity extends AppCompatActivity
         return null;
     }
 
+    //region BaseObjectFragmentListener Implementation
+    //--------------------------------------------------------------------------------
     @Override
-    public void onFragmentGetFocus(BaseObjectFragment fragment, View view) {
+    public void onBaseFragmentGetFocus(BaseObjectFragment fragment, View view) {
         Fragment mainFragment = fragment.getParentFragment();
         if (mainFragment instanceof MainFragment) {
             ((MainFragment)mainFragment).scrollToView(fragment.getView());
         }
     }
+    //--------------------------------------------------------------------------------
+    //endregion
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
         private MainFragment mainFragment = MainFragment.newInstance();
