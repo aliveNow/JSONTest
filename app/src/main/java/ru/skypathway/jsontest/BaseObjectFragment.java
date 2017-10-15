@@ -33,7 +33,7 @@ import ru.skypathway.jsontest.utils.InputFilterMinMax;
 import ru.skypathway.jsontest.utils.TextChangedListener;
 import ru.skypathway.jsontest.utils.Utils;
 
-// FIXME: 15.10.17 добавить описание по макетам
+
 /**
  * Created by samsmariya on 11.10.17.
  *
@@ -41,7 +41,16 @@ import ru.skypathway.jsontest.utils.Utils;
  * Activity, содержащие этот фрагмент должны реализовывать интерфейсы:
  * {@link BaseObjectFragment.BaseObjectFragmentDelegate},
  * {@link BaseObjectFragment.BaseObjectFragmentListener}.
+ *
+ * В layout-е наследующих фрагментов должны быть обязательно View с id:
+ * R.id.layout_results - это view будет отображаться при успешной загрузке результатов;
+ * R.id.layout_error - это view отображается при ошибке во время загрузки (подключить через include
+ * макет R.layout.section_error).
+ *
+ * Для возможности ввода id объекта с клавиатуры, layout должен содержать View c id
+ * R.id.layout_id_enter (подключить через include макет R.layout.section_enter_id).
  */
+
 public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         implements LoaderManager.LoaderCallbacks<LoaderResult<T>>,
         View.OnFocusChangeListener,
@@ -60,12 +69,13 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     protected boolean shouldShowError; // показывать ли секцию с ошибкой загрузки
     protected boolean shouldShowResult; // показывать ли секцию с результатом загрузки
 
-    protected View mLayoutResults; // секция загрузки
-    protected View mLayoutEnterId;
+    protected View mLayoutResults; // секция вывода результатов успешной загрузки
+    protected ProgressBar mProgressBar;
+
+    protected View mLayoutEnterId; // секция ввода id-объекта
     protected TextInputLayout mLayoutEditId;
     protected EditText mEditId;
     protected Button mButtonConfirmed;
-    protected ProgressBar mProgressBar;
 
     protected View mLayoutError; // секция ошибки
     protected TextView mTextErrorDescription;
@@ -126,6 +136,7 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
      * Инициализация views и подготовка их к выводу на экран.
      * Вызывается в {@link #onActivityCreated(Bundle)} после того, как восстановлены значения
      * из {@code savedInstanceState}.
+     * Здесь можно инициализировать {@link #mObjectIds} предустановленными значениями.
      *
      * @param savedInstanceState - передаётся из {@link #onActivityCreated(Bundle)}.
      */
