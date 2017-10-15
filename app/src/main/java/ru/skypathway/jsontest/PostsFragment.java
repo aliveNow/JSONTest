@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import ru.skypathway.jsontest.data.BaseObjectType;
 import ru.skypathway.jsontest.data.dao.Post;
-import ru.skypathway.jsontest.utils.Constants;
 
 
 /**
@@ -36,8 +36,9 @@ public class PostsFragment extends BaseObjectFragment<Post> {
     }
 
     @Override
-    public @NonNull Constants.CategoryEnum getCategory() {
-        return Constants.CategoryEnum.POSTS;
+    public @NonNull
+    BaseObjectType getBaseObjectType() {
+        return BaseObjectType.POSTS;
     }
 
     @Override

@@ -10,8 +10,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import ru.skypathway.jsontest.data.BaseObjectType;
 import ru.skypathway.jsontest.data.dao.User;
-import ru.skypathway.jsontest.utils.Constants;
 import ru.skypathway.jsontest.utils.DividerItemDecoration;
 
 
@@ -45,8 +45,9 @@ public class UsersFragment extends BaseObjectFragment<User> {
     }
 
     @Override
-    public @NonNull Constants.CategoryEnum getCategory() {
-        return Constants.CategoryEnum.USERS;
+    public @NonNull
+    BaseObjectType getBaseObjectType() {
+        return BaseObjectType.USERS;
     }
 
     @Override

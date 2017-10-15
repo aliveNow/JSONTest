@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import ru.skypathway.jsontest.R;
-import ru.skypathway.jsontest.utils.Constants;
 import ru.skypathway.jsontest.utils.Utils;
 
 /**
@@ -48,12 +47,15 @@ import ru.skypathway.jsontest.utils.Utils;
 
 public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderResult<D>> {
     private static final String TAG = BaseLoader.class.getSimpleName();
+    public static final int CONNECTION_TIMEOUT = 10000;
 
     protected int[] mObjectIds;
 
+    protected int mConnectionTimeout = CONNECTION_TIMEOUT;
     protected Cache<Integer, D> mCache;
     private int mCacheSize = 50;
     private int mCacheExpireTime = 10;
+
 
     public BaseLoader(@NonNull Context context,
                       @NonNull int[] objectIds) {
@@ -207,7 +209,7 @@ public abstract class BaseLoader<D> extends AsyncTaskLoader<BaseLoader.LoaderRes
         }
         URL url = new URL(urlSpec);
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-        connection.setConnectTimeout(Constants.CONNECTION_TIMEOUT);
+        connection.setConnectTimeout(mConnectionTimeout);
         // TODO: 10.10.17 java 7 и try с ресурсами. Update 14.10.17 - увы, только с 19 API работает.
         try {
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {

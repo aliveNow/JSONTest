@@ -14,8 +14,8 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import ru.skypathway.jsontest.data.BaseLoader.LoaderResult;
+import ru.skypathway.jsontest.data.BaseObjectType;
 import ru.skypathway.jsontest.data.dao.Photo;
-import ru.skypathway.jsontest.utils.Constants;
 
 
 /**
@@ -48,8 +48,9 @@ public class PhotosFragment extends BaseObjectFragment<Photo>
     }
 
     @Override
-    public @NonNull Constants.CategoryEnum getCategory() {
-        return Constants.CategoryEnum.PHOTOS;
+    public @NonNull
+    BaseObjectType getBaseObjectType() {
+        return BaseObjectType.PHOTOS;
     }
 
     @Override

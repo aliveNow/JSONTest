@@ -3,7 +3,6 @@ package ru.skypathway.jsontest;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +10,12 @@ import android.widget.TextView;
 
 import java.util.Random;
 
+import ru.skypathway.jsontest.data.BaseObjectType;
 import ru.skypathway.jsontest.data.dao.ToDo;
-import ru.skypathway.jsontest.utils.Constants;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * Created by samsmariya on 14.10.17.
  */
 public class ToDosFragment extends BaseObjectFragment<ToDo> {
     private TextView mTextId;
@@ -39,15 +38,15 @@ public class ToDosFragment extends BaseObjectFragment<ToDo> {
         mTextCompleted = findViewById(R.id.text_completed);
         if (savedInstanceState == null) {
             Random r = new Random();
-            int randomId = r.nextInt(mCategory.maxId + 1 - mCategory.minId) + mCategory.minId;
+            int randomId = r.nextInt(mType.maxId + 1 - mType.minId) + mType.minId;
             mObjectIds = new int[]{randomId};
         }
     }
 
     @NonNull
     @Override
-    public Constants.CategoryEnum getCategory() {
-        return Constants.CategoryEnum.TODOS;
+    public BaseObjectType getBaseObjectType() {
+        return BaseObjectType.TODOS;
     }
 
     @Override

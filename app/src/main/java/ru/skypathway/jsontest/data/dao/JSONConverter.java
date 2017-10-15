@@ -8,7 +8,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.skypathway.jsontest.utils.Constants;
+import ru.skypathway.jsontest.data.BaseObjectType;
 
 /**
  * Created by samsmariya on 10.10.17.
@@ -17,11 +17,11 @@ import ru.skypathway.jsontest.utils.Constants;
 public class JSONConverter {
 
     public static<T extends BaseObject> T getBaseObject(JSONObject jsonObject,
-                                                        Constants.CategoryEnum category) throws JSONException{
+                                                        BaseObjectType type) throws JSONException{
         if (jsonObject == null) {
             return null;
         }
-        switch (category) {
+        switch (type) {
             case POSTS: return (T) getPost(jsonObject);
             case COMMENTS: return (T) getComment(jsonObject);
             case USERS: return (T) getUser(jsonObject);
@@ -32,10 +32,10 @@ public class JSONConverter {
     }
 
     public static<T extends BaseObject> List<T> getObjectsList(List<JSONObject> jsonObjects,
-                                                               Constants.CategoryEnum category) throws JSONException {
+                                                               BaseObjectType type) throws JSONException {
         List<T> listResult = new ArrayList<>();
         for (JSONObject jsonObject : jsonObjects) {
-            T object = getBaseObject(jsonObject, category);
+            T object = getBaseObject(jsonObject, type);
             if (object != null) {
                 listResult.add(object);
             }

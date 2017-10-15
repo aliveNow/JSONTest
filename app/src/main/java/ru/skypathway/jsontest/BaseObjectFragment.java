@@ -25,6 +25,7 @@ import java.util.List;
 
 import ru.skypathway.jsontest.data.BaseLoader.LoaderResult;
 import ru.skypathway.jsontest.data.BaseObjectLoader;
+import ru.skypathway.jsontest.data.BaseObjectType;
 import ru.skypathway.jsontest.data.ExceptionWrapper;
 import ru.skypathway.jsontest.data.dao.BaseObject;
 import ru.skypathway.jsontest.utils.Constants;
@@ -32,6 +33,7 @@ import ru.skypathway.jsontest.utils.InputFilterMinMax;
 import ru.skypathway.jsontest.utils.TextChangedListener;
 import ru.skypathway.jsontest.utils.Utils;
 
+// FIXME: 15.10.17 добавить описание по макетам
 /**
  * Created by samsmariya on 11.10.17.
  *
@@ -52,7 +54,7 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
 
     protected List<T> mObjects;
     protected int[] mObjectIds;
-    protected final Constants.CategoryEnum mCategory = getCategory();
+    protected final BaseObjectType mType = getBaseObjectType();
 
     protected ExceptionWrapper mLoadingError;
     protected boolean shouldShowError; // показывать ли секцию с ошибкой загрузки
@@ -145,10 +147,10 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
                 }
             });
             mLayoutEditId.setHint(getString(R.string.hint_enter_object_id,
-                    mCategory.maxId,
-                    Utils.getCategoryNameGenitive(getActivity(), mCategory)));
+                    mType.maxId,
+                    Utils.getTypeNameGenitive(getActivity(), mType)));
             mEditId.setFilters(new InputFilter[]
-                    {new InputFilterMinMax(mCategory.minId, mCategory.maxId)});
+                    {new InputFilterMinMax(mType.minId, mType.maxId)});
             mEditId.setOnEditorActionListener(this);
             mEditId.addTextChangedListener(new TextChangedListener<EditText>(mEditId){
                 @Override
@@ -180,7 +182,8 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
      * Определяет категорию объекта, используемую при загрузке данных.
      * @return категория объекта, совпадающая с параметром типа фрагмента
      */
-    public abstract @NonNull Constants.CategoryEnum getCategory();
+    public abstract @NonNull
+    BaseObjectType getBaseObjectType();
 
     /**
      * Отображает ли наследующий фрагмент только один объект или список.
@@ -217,11 +220,11 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     }
 
     public int getLoaderId() {
-        return mCategory.ordinal();
+        return mType.ordinal();
     }
 
     protected Loader<LoaderResult<T>> getNewLoader(Bundle args) {
-        return new BaseObjectLoader<>(getActivity(), mCategory, mObjectIds);
+        return new BaseObjectLoader<>(getActivity(), mType, mObjectIds);
     }
 
     @Override
@@ -253,9 +256,9 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         }
         if (data.getError() != null) {
             String errorStr;
-            String categoryName = Utils.getCategoryNameGenitive(getActivity(), mCategory, mObjectIds.length);
+            String typeName = Utils.getTypeNameGenitive(getActivity(), mType, mObjectIds.length);
             errorStr = getResources().getString(R.string.msg_loading_failed,
-                    categoryName,
+                    typeName,
                     getResources().getQuantityString(R.plurals.plurals_ids, mObjectIds.length),
                     Utils.arrayToString(",", mObjectIds));
             mLoadingError = new ExceptionWrapper(data.getError(), errorStr);

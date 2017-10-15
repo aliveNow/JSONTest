@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.view.inputmethod.InputMethodManager;
 
 import ru.skypathway.jsontest.R;
+import ru.skypathway.jsontest.data.BaseObjectType;
 
 /**
  * Created by samsmariya on 11.10.17.
@@ -49,13 +50,13 @@ public class Utils {
         return builder.toString();
     }
 
-    public static String getCategoryNameGenitive(Context context, Constants.CategoryEnum category) {
-        return getCategoryNameGenitive(context, category, 1);
+    public static String getTypeNameGenitive(Context context, BaseObjectType type) {
+        return getTypeNameGenitive(context, type, 1);
     }
 
-    public static String getCategoryNameGenitive(Context context, Constants.CategoryEnum category, int size) {
+    public static String getTypeNameGenitive(Context context, BaseObjectType type, int size) {
         int strId = 0;
-        switch (category) {
+        switch (type) {
             case NONE: break;
             case POSTS: strId = R.plurals.plurals_post; break;
             case COMMENTS: strId = R.plurals.plurals_comment;break;

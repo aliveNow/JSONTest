@@ -8,8 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import ru.skypathway.jsontest.data.BaseObjectType;
 import ru.skypathway.jsontest.data.dao.Comment;
-import ru.skypathway.jsontest.utils.Constants;
 
 
 /**
@@ -39,8 +39,9 @@ public class CommentsFragment extends BaseObjectFragment<Comment> {
     }
 
     @Override
-    public @NonNull Constants.CategoryEnum getCategory() {
-        return Constants.CategoryEnum.COMMENTS;
+    public @NonNull
+    BaseObjectType getBaseObjectType() {
+        return BaseObjectType.COMMENTS;
     }
 
     @Override
