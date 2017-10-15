@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_view"
+    style="@style/CardViewStyle"
+    tools:context="ru.skypathway.jsontest.ToDosFragment">
+
+    <LinearLayout style="@style/LinearLayoutCardContent">
+
+        <TextView
+            android:id="@+id/text_card_title"
+            android:text="@string/title_item_todos"
+            style="@style/TextViewCardTitle" />
+
+        <include layout="@layout/progress_bar"/>
+
+        <include layout="@layout/section_results_todos"/>
+
+        <include layout="@layout/section_error"/>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

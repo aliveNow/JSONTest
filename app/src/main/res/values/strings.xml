@@ -33,6 +33,9 @@
     <string name="users_genitive">пользователей</string>
     <string name="todos_genitive">to dos</string>
     <string name="ids_genitive">ids</string>
+    <string name="text_id_equals">id = %d</string>
+    <string name="text_status_completed">завершено</string>
+    <string name="text_status_non_completed">не завершено</string>
 
     <plurals name="plurals_user">
         <item quantity="one">пользователя</item>

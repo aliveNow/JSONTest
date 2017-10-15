@@ -27,6 +27,13 @@
                 />
 
             <fragment
+                android:id="@+id/fragment_todos"
+                android:name="ru.skypathway.jsontest.ToDosFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+            <fragment
                 android:id="@+id/fragment_posts"
                 android:name="ru.skypathway.jsontest.PostsFragment"
                 android:layout_width="match_parent"

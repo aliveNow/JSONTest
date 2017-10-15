@@ -26,8 +26,7 @@ public class JSONConverter {
             case COMMENTS: return (T) getComment(jsonObject);
             case USERS: return (T) getUser(jsonObject);
             case PHOTOS: return (T) getPhoto(jsonObject);
-            case TODOS:
-                break;
+            case TODOS: return (T) getToDo(jsonObject);
         }
         return null;
     }
@@ -75,6 +74,14 @@ public class JSONConverter {
         newObject.id = jsonObject.getInt("id");
         newObject.name = jsonObject.getString("name");
         newObject.username = jsonObject.getString("username");
+        return newObject;
+    }
+
+    static ToDo getToDo(@NonNull JSONObject jsonObject) throws JSONException {
+        ToDo newObject = new ToDo();
+        newObject.id = jsonObject.getInt("id");
+        newObject.title = jsonObject.getString("title");
+        newObject.completed = jsonObject.getBoolean("completed");
         return newObject;
     }
     

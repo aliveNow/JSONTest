@@ -38,6 +38,7 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         View.OnFocusChangeListener,
         TextView.OnEditorActionListener {
     private static final String TAG = BaseObjectFragment.class.getSimpleName();
+    protected static final String LOADING_ERROR_EXTRA = "loading_error";
 
     protected BaseObjectFragmentDelegate mDelegate;
     protected BaseObjectFragmentListener mListener;
@@ -68,6 +69,7 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         onPrepareViews(savedInstanceState);
         if (savedInstanceState != null) {
             mObjectIds = savedInstanceState.getIntArray(Constants.Extras.OBJECT_IDS);
+            mLoadingError = (ExceptionWrapper) savedInstanceState.getSerializable(LOADING_ERROR_EXTRA);
         }
         if (!Utils.isEmptyArray(mObjectIds)) {
             getLoaderManager().initLoader(getLoaderId(), null, this);
@@ -78,6 +80,7 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putIntArray(Constants.Extras.OBJECT_IDS, mObjectIds);
+        outState.putSerializable(LOADING_ERROR_EXTRA, mLoadingError);
     }
 
     @Override
