@@ -11,6 +11,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -266,19 +267,26 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         int objId = 0;
         try {
             objId = Integer.parseInt(mEditId.getText().toString());
-        }catch (NumberFormatException nfe) {}
+        }catch (NumberFormatException nfe) {
+            Log.e(TAG, "something went wrong, check your code " + nfe);
+            /* TODO: 15.10.17 диалог на маловероятный случай, что пользователю удастся ввести сюда
+             что-нибудь неправильное? Фильтр на EditText даже вставку не даёт сделать не того типа. */
+        }
         if (objId > 0) {
             mObjectIds = new int[]{objId};
-            Utils.hideSoftInputKeyboard(getActivity());
-            mEditId.clearFocus();
-            getLoaderManager().restartLoader(getLoaderId(), null, this);
-            mListener.onFragmentGetFocus(this, mButtonConfirmed);
+            restartLoading();
         }
     }
 
     protected void onButtonTryAgainClick() {
+        restartLoading();
+    }
+
+    protected void restartLoading() {
         Utils.hideSoftInputKeyboard(getActivity());
+        mEditId.clearFocus();
         getLoaderManager().restartLoader(getLoaderId(), null, this);
+        mListener.onFragmentGetFocus(this, mButtonConfirmed);
     }
 
     protected void showProgressBar() {
