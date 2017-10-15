@@ -20,8 +20,15 @@
             <include layout="@layout/card_error"/>
 
             <fragment
-                android:id="@+id/fragment_photos"
-                android:name="ru.skypathway.jsontest.PhotosFragment"
+                android:id="@+id/fragment_posts"
+                android:name="ru.skypathway.jsontest.PostsFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+            <fragment
+                android:id="@+id/fragment_comments"
+                android:name="ru.skypathway.jsontest.CommentsFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 />
@@ -29,13 +36,6 @@
             <fragment
                 android:id="@+id/fragment_todos"
                 android:name="ru.skypathway.jsontest.ToDosFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
-
-            <fragment
-                android:id="@+id/fragment_posts"
-                android:name="ru.skypathway.jsontest.PostsFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 />
@@ -49,15 +49,15 @@
             android:orientation="vertical">
 
             <fragment
-                android:id="@+id/fragment_comments"
-                android:name="ru.skypathway.jsontest.CommentsFragment"
+                android:id="@+id/fragment_users"
+                android:name="ru.skypathway.jsontest.UsersFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 />
 
             <fragment
-                android:id="@+id/fragment_users"
-                android:name="ru.skypathway.jsontest.UsersFragment"
+                android:id="@+id/fragment_photos"
+                android:name="ru.skypathway.jsontest.PhotosFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 />
