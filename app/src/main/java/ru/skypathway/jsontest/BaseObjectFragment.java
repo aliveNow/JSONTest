@@ -2,6 +2,7 @@ package ru.skypathway.jsontest;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -33,6 +34,11 @@ import ru.skypathway.jsontest.utils.Utils;
 
 /**
  * Created by samsmariya on 11.10.17.
+ *
+ * Базовый фрагмент для загрузки и отображения объектов, наследующих от {@link BaseObject}.
+ * Activity, содержащие этот фрагмент должны реализовывать интерфейсы:
+ * {@link BaseObjectFragment.BaseObjectFragmentDelegate},
+ * {@link BaseObjectFragment.BaseObjectFragmentListener}.
  */
 public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         implements LoaderManager.LoaderCallbacks<LoaderResult<T>>,
@@ -49,31 +55,33 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
     protected final Constants.CategoryEnum mCategory = getCategory();
 
     protected ExceptionWrapper mLoadingError;
-    protected boolean shouldShowError;
-    protected boolean shouldShowResult;
+    protected boolean shouldShowError; // показывать ли секцию с ошибкой загрузки
+    protected boolean shouldShowResult; // показывать ли секцию с результатом загрузки
 
-    protected View mLayoutResults;
+    protected View mLayoutResults; // секция загрузки
     protected View mLayoutEnterId;
     protected TextInputLayout mLayoutEditId;
     protected EditText mEditId;
     protected Button mButtonConfirmed;
     protected ProgressBar mProgressBar;
 
-    protected View mLayoutError;
+    protected View mLayoutError; // секция ошибки
     protected TextView mTextErrorDescription;
     protected TextView mTextError;
     protected Button mButtonTryAgain;
 
     public BaseObjectFragment() {}
 
+    //region Overridden Fragment Methods
+    //--------------------------------------------------------------------------------
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        onPrepareViews(savedInstanceState);
         if (savedInstanceState != null) {
             mObjectIds = savedInstanceState.getIntArray(Constants.Extras.OBJECT_IDS);
             mLoadingError = (ExceptionWrapper) savedInstanceState.getSerializable(LOADING_ERROR_EXTRA);
         }
+        onPrepareViews(savedInstanceState);
         if (!Utils.isEmptyArray(mObjectIds)) {
             getLoaderManager().initLoader(getLoaderId(), null, this);
         }
@@ -109,7 +117,17 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         mDelegate = null;
         mListener = null;
     }
+    //--------------------------------------------------------------------------------
+    //endregion
 
+    /**
+     * Инициализация views и подготовка их к выводу на экран.
+     * Вызывается в {@link #onActivityCreated(Bundle)} после того, как восстановлены значения
+     * из {@code savedInstanceState}.
+     *
+     * @param savedInstanceState - передаётся из {@link #onActivityCreated(Bundle)}.
+     */
+    @CallSuper
     protected void onPrepareViews(Bundle savedInstanceState) {
         mLayoutResults = findViewById(R.id.layout_results);
         Utils.requireNonNull(mLayoutResults, TAG +
@@ -158,37 +176,42 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         hideProgressBar();
     }
 
-    public void onFocusChange(View v, boolean hasFocus) {
-        if (hasFocus) {
-            mListener.onFragmentGetFocus(this, v);
-        }
-    }
-
-    @Override
-    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        if (actionId == EditorInfo.IME_ACTION_DONE) {
-            onButtonConfirmedClick();
-            return true;
-        }
-        return false;
-    }
-
-    protected<T> T findViewById(@IdRes int viewId) {
-        return (T) getView().findViewById(viewId);
-    }
-
-    protected int getFirstObjectId() {
-        if (!Utils.isEmptyArray(mObjectIds)) {
-            return mObjectIds[0];
-        }
-        return 0;
-    }
-
+    /**
+     * Определяет категорию объекта, используемую при загрузке данных.
+     * @return категория объекта, совпадающая с параметром типа фрагмента
+     */
     public abstract @NonNull Constants.CategoryEnum getCategory();
+
+    /**
+     * Отображает ли наследующий фрагмент только один объект или список.
+     * @return true - наследующий фрагмент отображает только один объект.
+     *         После загрузки данных вызывается {@link #onDataObjectChange(BaseObject)};
+     *         false - наследующий фрагмент отображает список объектов.
+     *         После загрузки данных вызывается {@link #onDataChange(List)}
+     */
     protected abstract boolean isOneObjectFragment();
+
+    /**
+     * Вызывается при успешной загрузке, если {@link #isOneObjectFragment()} возвращает false.
+     * @param data - загруженный список объектов целиком
+     */
     protected void onDataChange(List<T> data) {}
+
+    /**
+     * Вызывается при успешной загрузке, если {@link #isOneObjectFragment()} возвращает true.
+     * @param data - первый объект из загруженного списка
+     */
     protected void onDataObjectChange(T data) {}
 
+    /**
+     * Переопределить этот метод, если нужно продолжить загрузку после
+     * {@link #onLoadFinished(Loader, LoaderResult)}.
+     *
+     * @param data - загруженный результат
+     * @return true - загрузка продолжается, наследующий фрагмент должен сам вызвать
+     *         {@link #hideProgressBar()} после окончания;
+     *         false - загрузка окончена
+     */
     protected boolean willContinueLoadData(LoaderResult<T> data){
         return false;
     }
@@ -210,6 +233,8 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         return null;
     }
 
+    //region LoaderManager.LoaderCallbacks Implementation
+    //--------------------------------------------------------------------------------
     @Override
     public void onLoadFinished(Loader<LoaderResult<T>> loader, LoaderResult<T> data) {
         mObjects = data.getResult();
@@ -217,7 +242,7 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
             mObjects = null;
             shouldShowResult = false;
         }else {
-            shouldShowResult = !mDelegate.onFragmentObjectLoadFinished(this, mObjects);
+            shouldShowResult = !mDelegate.onBaseFragmentLoadFinished(this, (List<BaseObject>) mObjects);
         }
         if (shouldShowResult) {
             if (isOneObjectFragment()) {
@@ -234,7 +259,7 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
                     getResources().getQuantityString(R.plurals.plurals_ids, mObjectIds.length),
                     Utils.arrayToString(",", mObjectIds));
             mLoadingError = new ExceptionWrapper(data.getError(), errorStr);
-            shouldShowError = !mDelegate.onFragmentObjectLoadingException(this, mLoadingError);
+            shouldShowError = !mDelegate.onBaseFragmentLoadingException(this, mLoadingError);
             if (shouldShowError) {
                 onLoaderError(mLoadingError);
             }
@@ -257,6 +282,8 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         }
         hideProgressBar();
     }
+    //--------------------------------------------------------------------------------
+    //endregion
 
     protected void onLoaderError(ExceptionWrapper loadingError) {
         mTextError.setText(loadingError.getLocalizedMessage());
@@ -305,13 +332,89 @@ public abstract class BaseObjectFragment<T extends BaseObject> extends Fragment
         mLayoutError.setVisibility(shouldShowError ? View.VISIBLE : View.GONE);
     }
 
-    public interface BaseObjectFragmentDelegate {
-        boolean onFragmentObjectLoadFinished(BaseObjectFragment fragment, Object object);
-        boolean onFragmentObjectLoadingException(BaseObjectFragment fragment,
-                                                 ExceptionWrapper exception);
+    //region Listeners Implementation
+    //--------------------------------------------------------------------------------
+    // View.OnFocusChangeListener
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        if (hasFocus) {
+            mListener.onFragmentGetFocus(this, v);
+        }
     }
 
+    // TextView.OnEditorActionListener
+    @Override
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+            onButtonConfirmedClick();
+            return true;
+        }
+        return false;
+    }
+    //--------------------------------------------------------------------------------
+    //endregion
+
+    //region Helper Methods
+    //--------------------------------------------------------------------------------
+    protected<T> T findViewById(@IdRes int viewId) {
+        return (T) getView().findViewById(viewId);
+    }
+
+    protected int getFirstObjectId() {
+        if (!Utils.isEmptyArray(mObjectIds)) {
+            return mObjectIds[0];
+        }
+        return 0;
+    }
+    //--------------------------------------------------------------------------------
+    //endregion
+
+    //region Activity Interfaces Declaration
+    //--------------------------------------------------------------------------------
+    /**
+     * Делегат обработки результатов загрузки фрагмента.
+     */
+    public interface BaseObjectFragmentDelegate {
+
+        /**
+         * Вызывается в случае успешной загрузки.
+         *
+         * @param fragment - экземпляр текущего фрагмента
+         * @param list - результат загрузки
+         * @return true - результаты загрузки будут обработаны делегатом,
+         *                не показывать их во фрагменте;
+         *         false - показать результ загрузки в фрагменте.
+         */
+        boolean onBaseFragmentLoadFinished(BaseObjectFragment fragment, List<BaseObject> list);
+
+        /**
+         * Вызывается в случае ошибки во время загрузки.
+         *
+         * @param fragment - экземпляр текущего фрагмента
+         * @param exception - ошибка загрузки - обёрнутое исключение, которое возвращает в
+         *                  {@link ExceptionWrapper#getMessage()} локализованное сообщение
+         *                  неудавшегося действия, оригинальное исключение можно получить через
+         *                  {@link ExceptionWrapper#getCause()}
+         * @return true - ошибка будет обработана делегатом, не показывать её во фрагменте;
+         *         false - показать ошибку в фрагменте.
+         */
+        boolean onBaseFragmentLoadingException(BaseObjectFragment fragment,
+                                               ExceptionWrapper exception);
+    }
+
+    /**
+     * Листенер для событий фрагмента.
+     */
     public interface BaseObjectFragmentListener {
+
+        /**
+         * Вызывается, если фрагмент получил фокус на EditText или была нажата любая кнопка загрузки.
+         *
+         * @param fragment - экземпляр текущего фрагмента
+         * @param view - которое получило фокус
+         */
         void onFragmentGetFocus(BaseObjectFragment fragment, View view);
     }
+    //--------------------------------------------------------------------------------
+    //endregion
 }

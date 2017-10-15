@@ -10,6 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import java.util.List;
+
+import ru.skypathway.jsontest.data.dao.BaseObject;
 import ru.skypathway.jsontest.utils.CanHandleExceptionWrapper;
 import ru.skypathway.jsontest.data.ExceptionWrapper;
 
@@ -44,7 +47,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onFragmentObjectLoadFinished(BaseObjectFragment fragment, Object object) {
+    public boolean onBaseFragmentLoadFinished(BaseObjectFragment fragment, List<BaseObject> list) {
         CanHandleExceptionWrapper exceptionHandler = findExceptionHandler(fragment);
         if (exceptionHandler != null) {
             exceptionHandler.hideAllErrors();
@@ -53,8 +56,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onFragmentObjectLoadingException(BaseObjectFragment fragment,
-                                                    ExceptionWrapper exception) {
+    public boolean onBaseFragmentLoadingException(BaseObjectFragment fragment,
+                                                  ExceptionWrapper exception) {
         CanHandleExceptionWrapper exceptionHandler = findExceptionHandler(fragment);
         if (exceptionHandler != null) {
             exceptionHandler.showError(exception);
